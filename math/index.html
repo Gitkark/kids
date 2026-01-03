@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- iPad / iOS web-app friendliness -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>Math Practice (Grades 1–4)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0b1020; color: #e9ecf5; -webkit-text-size-adjust: 100%; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 20px; }
+
+    /* Touch tweaks */
+    button, select, input {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    header { display: flex; gap: 14px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0.2px; }
+
+    .panel {
+      margin-top: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.2fr 1.2fr 1fr 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 980px) { .controls { grid-template-columns: 1fr 1fr; } }
+
+    label { display: grid; gap: 7px; font-size: 13px; color: rgba(233,236,245,0.94); }
+    select, button, input[type="number"], input[type="text"] {
+      background: rgba(0,0,0,0.35);
+      color: #e9ecf5;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 16px; /* important for iOS: prevents auto-zoom */
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 800;
+      min-height: 48px; /* better tap target */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    select { min-height: 48px; }
+    button.primary { background: rgba(64, 140, 255, 0.42); border-color: rgba(64,140,255,0.80); }
+    button:active { transform: translateY(1px); }
+
+    .rowBtns { display:flex; gap:10px; flex-wrap:wrap; }
+    .smallNote { font-size: 12px; opacity: 0.84; font-weight: 650; margin-top: 5px; }
+
+    .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 14px;
+      color: rgba(233,236,245,0.95);
+      font-weight: 750;
+    }
+    .pill.ok { border-color: rgba(120,255,176,0.55); }
+
+    .grid2 {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 980px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .card {
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      padding: 16px;
+    }
+
+    .kumon {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items: center;
+      justify-items: center;
+      padding: 4px 0 2px;
+    }
+
+    .stepTitle { font-size: 13px; opacity: 0.92; font-weight: 800; text-align:center; }
+
+    .equationHorizontal {
+      font-size: 60px;
+      letter-spacing: 1px;
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+    }
+
+    .equationVerticalWrap { display: grid; place-items: center; width: 100%; }
+    .equationVertical {
+      font-size: 60px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: 1px;
+      text-align: right;
+      padding: 10px 14px 12px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.12);
+      min-width: 360px;
+    }
+    .vrow { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .vtop { padding-right: 8px; }
+    /* OP on LEFT of second row */
+    .vbottom {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding-right: 8px;
+    }
+    .vopLeft { text-align: left; min-width: 1ch; }
+    .vnumRight { text-align: right; }
+    .vline { height: 2px; background: rgba(233,236,245,0.86); border-radius: 2px; margin: 2px 0; }
+
+    .answerRow {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    #answer {
+      width: 240px;
+      text-align: center;
+      font-size: 26px;
+      padding: 14px 16px;
+      font-weight: 900;
+      min-height: 52px; /* comfortable touch + keyboard target */
+    }
+
+    .feedback { min-height: 30px; text-align: center; font-size: 18px; font-weight: 900; }
+    .okText { color: #78ffb0; }
+    .badText { color: #ff8aa1; }
+    .hint { color: rgba(233,236,245,0.82); font-size: 14px; text-align: center; margin-top: 6px; font-weight: 700; }
+    .footer { margin-top: 10px; opacity: 0.78; font-size: 12px; text-align: center; font-weight: 650; }
+
+    .historyHeader { display:flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap:10px; }
+    .historyTitle { font-size: 15px; font-weight: 900; }
+    .historyList { margin-top: 10px; display:grid; gap:10px; }
+    .histItem {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      padding: 11px 11px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .histLeft { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.95;
+    }
+    .tag.pass { border-color: rgba(120,255,176,0.55); }
+    .tag.fail { border-color: rgba(255,138,161,0.55); }
+
+    /* -------- Printable worksheet area (hidden on screen) -------- */
+    #printArea { display:none; }
+    @media print {
+      body { background: #fff; color: #000; }
+      .wrap, header, .panel, .grid2, .card, .kumon, .stats, .footer { display:none !important; }
+      #printArea { display:block !important; }
+      #printArea * { color:#000 !important; }
+
+      .pSheet { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 18mm; }
+      .pHeader { display:flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+      .pTitle { font-size: 16pt; font-weight: 900; }
+      .pMeta { font-size: 10.5pt; font-weight: 700; text-align:right; }
+      .pLine { border-top: 2px solid #000; margin: 10px 0 12px; }
+      .pInfo { display:flex; justify-content: space-between; font-size: 11pt; font-weight: 700; margin-bottom: 10px; }
+      .pGrid { display:grid; grid-template-columns: 1fr 1fr; gap: 10mm 14mm; }
+
+      .pProbH { font-size: 18pt; font-weight: 800; letter-spacing: 0.4px; }
+      .pBlank { display:inline-block; min-width: 40mm; border-bottom: 2px solid #000; transform: translateY(-2px); }
+
+      /* Vertical (op shown on LEFT) */
+      .pProbV { font-size: 18pt; font-weight: 900; letter-spacing: 0.4px; display: inline-block; min-width: 52mm; }
+      .pVRow { display:flex; justify-content:flex-end; }
+      .pVRow.op { display:grid; grid-template-columns: auto 1fr; gap: 6mm; align-items: baseline; }
+      .pVRow.op .opLeft { justify-self: start; }
+      .pVRow.op .numRight { justify-self: end; }
+      .pVLine { border-top: 2px solid #000; margin: 2mm 0 2mm; }
+      .pVAnswer { display:flex; justify-content:flex-end; }
+      .pVBlank { display:inline-block; min-width: 42mm; border-bottom: 2px solid #000; height: 0; }
+
+      .pFooter { margin-top: 10mm; font-size: 10pt; font-weight: 700; display:flex; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Math Practice (Grades 1–4)</h1>
+      <div class="pill" id="sessionClock">Session: 0:00</div>
+    </header>
+
+    <div class="panel">
+      <div class="controls">
+        <label>
+          Grade
+          <select id="grade">
+            <option value="1">Grade 1</option>
+            <option value="2" selected>Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+          </select>
+          <div class="smallNote">Each grade is split into A/B/C steps (small mastery steps).</div>
+        </label>
+
+        <label>
+          Step (A/B/C)
+          <select id="step"></select>
+          <div class="smallNote" id="stepDesc"></div>
+        </label>
+
+        <label>
+          Problems per worksheet
+          <input id="targetCount" type="number" min="5" max="100" value="20" />
+          <div class="smallNote">Try 20 for kids, 40 for older.</div>
+        </label>
+
+        <div style="display:grid; gap:10px;">
+          <button class="primary" id="startBtn">Start / New Worksheet</button>
+          <div class="rowBtns">
+            <button id="printBtn">Print Worksheet</button>
+            <button id="skipBtn">Skip</button>
+            <button id="resetStatsBtn">Reset Stats</button>
+            <button id="toggleAutoAdvanceBtn" title="Auto advance when mastery is reached">Auto-Advance: ON</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="pill" id="statProgress">Worksheet: 0/20</div>
+        <div class="pill" id="statStreak">Streak: 0</div>
+        <div class="pill" id="statAccuracy">Accuracy: 100%</div>
+        <div class="pill" id="statAvgTime">Avg time: 0.0s</div>
+        <div class="pill" id="statLayout">Layout: Mixed</div>
+        <div class="pill" id="statMastery">Mastery: Not yet</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="kumon">
+          <div class="stepTitle" id="stepTitle">Press Start</div>
+
+          <div id="equationHorizontal" class="equationHorizontal" style="display:none;">Press Start</div>
+
+          <div id="equationVerticalWrap" class="equationVerticalWrap" style="display:none;">
+            <div class="equationVertical">
+              <div class="vrow">
+                <div class="vtop" id="vTop"></div>
+                <div class="vbottom">
+                  <div id="vOp" class="vopLeft"></div>
+                  <div id="vBottom" class="vnumRight"></div>
+                </div>
+                <div class="vline"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="answerRow">
+            <input id="answer"
+                   type="text"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   placeholder="Type answer"
+                   enterkeyhint="done" />
+            <button class="primary" id="checkBtn">Check</button>
+            <button id="nextBtn">Next</button>
+          </div>
+
+          <div class="feedback" id="feedback"></div>
+          <div class="hint">Tap Check or press Done.</div>
+          <div class="footer">Small steps. Mastery. Repeat. Then move on.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="historyHeader">
+          <div class="historyTitle">Daily worksheet history</div>
+          <div class="rowBtns">
+            <button id="todayOnlyBtn">Today</button>
+            <button id="allHistoryBtn">All</button>
+            <button id="clearHistoryBtn">Clear history</button>
+          </div>
+        </div>
+        <div class="smallNote">Saved in this browser (localStorage). Each completed worksheet is logged.</div>
+        <div class="historyList" id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="printArea"></div>
+
+<script>
+(() => {
+  const STEPS = {
+    1: [
+      { letter:"A", id:"G1-A1", name:"A1: + within 5",  desc:"Add small numbers (0–5).", ops:["add"], a:[0,5], b:[0,5], carry:"no", mastery:{acc:0.90, time:8} },
+      { letter:"A", id:"G1-A2", name:"A2: + within 10", desc:"Add within 10 (no carry).", ops:["add"], a:[0,10], b:[0,10], carry:"no", mastery:{acc:0.90, time:8} },
+      { letter:"B", id:"G1-B1", name:"B1: − within 10", desc:"Subtract within 10 (no borrow).", ops:["sub"], a:[0,10], b:[0,10], borrow:"no", mastery:{acc:0.90, time:9} },
+      { letter:"B", id:"G1-B2", name:"B2: +/− within 10", desc:"Mixed add/sub within 10.", ops:["add","sub"], a:[0,10], b:[0,10], carry:"no", borrow:"no", mastery:{acc:0.90, time:9} },
+      { letter:"C", id:"G1-C1", name:"C1: + within 20", desc:"Add to 20 (mostly no carry).", ops:["add"], a:[0,20], b:[0,20], carry:"mostly_no", mastery:{acc:0.92, time:9} },
+      { letter:"C", id:"G1-C2", name:"C2: − within 20", desc:"Subtract within 20 (mostly no borrow).", ops:["sub"], a:[0,20], b:[0,20], borrow:"mostly_no", mastery:{acc:0.92, time:10} },
+    ],
+    2: [
+      { letter:"A", id:"G2-A1", name:"A1: + 2-digit no-carry", desc:"2-digit addition, no carry.", ops:["add"], a:[10,99], b:[10,99], carry:"no", mastery:{acc:0.92, time:10} },
+      { letter:"A", id:"G2-A2", name:"A2: − 2-digit no-borrow", desc:"2-digit subtraction, no borrow.", ops:["sub"], a:[10,99], b:[10,99], borrow:"no", mastery:{acc:0.92, time:11} },
+      { letter:"B", id:"G2-B1", name:"B1: + 2-digit with carry", desc:"2-digit addition with carry.", ops:["add"], a:[10,99], b:[10,99], carry:"yes", mastery:{acc:0.90, time:12} },
+      { letter:"B", id:"G2-B2", name:"B2: − 2-digit with borrow", desc:"2-digit subtraction with borrow.", ops:["sub"], a:[10,99], b:[10,99], borrow:"yes", mastery:{acc:0.90, time:12} },
+      { letter:"C", id:"G2-C1", name:"C1: mixed 2-digit +/−", desc:"Mixed 2-digit add/sub.", ops:["add","sub"], a:[10,99], b:[10,99], carry:"auto", borrow:"auto", mastery:{acc:0.90, time:12} },
+      { letter:"C", id:"G2-C2", name:"C2: + 3-digit (easy)", desc:"3-digit addition, lighter ranges.", ops:["add"], a:[100,399], b:[10,199], carry:"auto", mastery:{acc:0.88, time:13} },
+    ],
+    3: [
+      { letter:"A", id:"G3-A1", name:"A1: × facts 0–5", desc:"Multiplication facts: 0–5.", ops:["mul"], a:[0,5], b:[0,12], mastery:{acc:0.92, time:9} },
+      { letter:"A", id:"G3-A2", name:"A2: × facts 0–12", desc:"Multiplication facts: 0–12.", ops:["mul"], a:[0,12], b:[0,12], mastery:{acc:0.90, time:10} },
+      { letter:"B", id:"G3-B1", name:"B1: ÷ exact facts", desc:"Exact division using facts (no remainders).", ops:["div"], divisor:[2,12], quotient:[0,12], mastery:{acc:0.90, time:11} },
+      { letter:"B", id:"G3-B2", name:"B2: 3-digit +/−", desc:"3-digit add/sub practice.", ops:["add","sub"], a:[100,999], b:[10,999], carry:"auto", borrow:"auto", mastery:{acc:0.88, time:14} },
+      { letter:"C", id:"G3-C1", name:"C1: 2-digit × 1-digit", desc:"2-digit times 1-digit.", ops:["mul"], a:[10,99], b:[2,9], mastery:{acc:0.88, time:14} },
+      { letter:"C", id:"G3-C2", name:"C2: mixed × and ÷", desc:"Mixed multiplication/division (exact ÷).", ops:["mul","div"], a:[0,12], b:[0,12], divisor:[2,12], quotient:[0,12], mastery:{acc:0.88, time:13} },
+    ],
+    4: [
+      { letter:"A", id:"G4-A1", name:"A1: 4-digit +/− (easy)", desc:"Up to 4-digit add/sub.", ops:["add","sub"], a:[500,4999], b:[10,2999], carry:"auto", borrow:"auto", mastery:{acc:0.88, time:16} },
+      { letter:"A", id:"G4-A2", name:"A2: 2-digit × 1-digit", desc:"Fluency: 2-digit times 1-digit.", ops:["mul"], a:[10,99], b:[2,9], mastery:{acc:0.90, time:14} },
+      { letter:"B", id:"G4-B1", name:"B1: 2-digit × 2-digit (small)", desc:"2-digit times 2-digit (smaller).", ops:["mul"], a:[10,49], b:[10,49], mastery:{acc:0.86, time:18} },
+      { letter:"B", id:"G4-B2", name:"B2: ÷ exact with larger divisors", desc:"Exact division: 2-digit divisor, smaller quotients.", ops:["div"], divisor:[10,49], quotient:[2,20], mastery:{acc:0.86, time:18} },
+      { letter:"C", id:"G4-C1", name:"C1: mixed all", desc:"Mixed add/sub/mul/div (exact ÷).", ops:["add","sub","mul","div"], a:[10,99], b:[10,99], divisor:[2,12], quotient:[2,20], carry:"auto", borrow:"auto", mastery:{acc:0.86, time:18} },
+      { letter:"C", id:"G4-C2", name:"C2: 2-digit × 2-digit", desc:"2-digit times 2-digit.", ops:["mul"], a:[10,99], b:[10,99], mastery:{acc:0.84, time:20} },
+    ],
+  };
+
+  const HISTORY_KEY = "kumon_math_history_v4";
+
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+
+  function saveHistory(arr) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+  }
+
+  function addHistoryEntry(entry) {
+    const hist = loadHistory();
+    hist.unshift(entry);
+    if (hist.length > 120) hist.length = 120;
+    saveHistory(hist);
+  }
+
+  const state = {
+    current: null,
+    started: false,
+    setTarget: 20,
+    setDone: 0,
+    correct: 0,
+    total: 0,
+    streak: 0,
+    perProblemTimes: [],
+    problemStartTs: null,
+    sessionStartTs: Date.now(),
+    lastLayout: "Mixed",
+    autoAdvance: true,
+    passedThisWorksheet: false,
+    historyFilter: "today",
+  };
+
+  const el = {
+    grade: document.getElementById('grade'),
+    step: document.getElementById('step'),
+    stepDesc: document.getElementById('stepDesc'),
+    stepTitle: document.getElementById('stepTitle'),
+    targetCount: document.getElementById('targetCount'),
+    startBtn: document.getElementById('startBtn'),
+    printBtn: document.getElementById('printBtn'),
+    skipBtn: document.getElementById('skipBtn'),
+    resetStatsBtn: document.getElementById('resetStatsBtn'),
+    toggleAutoAdvanceBtn: document.getElementById('toggleAutoAdvanceBtn'),
+
+    eqH: document.getElementById('equationHorizontal'),
+    eqVWrap: document.getElementById('equationVerticalWrap'),
+    vTop: document.getElementById('vTop'),
+    vBottom: document.getElementById('vBottom'),
+    vOp: document.getElementById('vOp'),
+
+    answer: document.getElementById('answer'),
+    checkBtn: document.getElementById('checkBtn'),
+    nextBtn: document.getElementById('nextBtn'),
+    feedback: document.getElementById('feedback'),
+
+    statProgress: document.getElementById('statProgress'),
+    statStreak: document.getElementById('statStreak'),
+    statAccuracy: document.getElementById('statAccuracy'),
+    statAvgTime: document.getElementById('statAvgTime'),
+    statLayout: document.getElementById('statLayout'),
+    statMastery: document.getElementById('statMastery'),
+    sessionClock: document.getElementById('sessionClock'),
+
+    historyList: document.getElementById('historyList'),
+    todayOnlyBtn: document.getElementById('todayOnlyBtn'),
+    allHistoryBtn: document.getElementById('allHistoryBtn'),
+    clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+
+    printArea: document.getElementById('printArea'),
+  };
+
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const randInt = (min, maxInclusive) => Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function safeFocusAnswer() {
+    setTimeout(() => {
+      try { el.answer.focus({ preventScroll: true }); }
+      catch { el.answer.focus(); }
+    }, isIOS() ? 50 : 0);
+  }
+
+  function computeAvgTime() {
+    if (!state.perProblemTimes.length) return 0;
+    const sum = state.perProblemTimes.reduce((a,b) => a + b, 0);
+    return sum / state.perProblemTimes.length;
+  }
+
+  function setFeedback(msg, kind) {
+    el.feedback.textContent = msg || '';
+    el.feedback.className = 'feedback ' + (kind || '');
+  }
+
+  function getSelectedStepObj() {
+    const g = Number(el.grade.value);
+    const idx = Number(el.step.value || 0);
+    return STEPS[g][idx];
+  }
+
+  function updateStepDropdown() {
+    const g = Number(el.grade.value);
+    const steps = STEPS[g];
+    el.step.innerHTML = "";
+    steps.forEach((s, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = `${s.letter} | ${s.name}`;
+      el.step.appendChild(opt);
+    });
+    el.step.value = "0";
+    updateStepDescription();
+  }
+
+  function updateStepDescription() {
+    const s = getSelectedStepObj();
+    el.stepDesc.textContent = `${s.desc}  Mastery: ≥${Math.round(s.mastery.acc*100)}% and ≤${s.mastery.time.toFixed(0)}s avg`;
+    el.stepTitle.textContent = `${s.id}  |  ${s.desc}`;
+  }
+
+  function updateStats() {
+    el.statProgress.textContent = `Worksheet: ${state.setDone}/${state.setTarget}`;
+    el.statStreak.textContent = `Streak: ${state.streak}`;
+    const acc = state.total ? Math.round((state.correct / state.total) * 100) : 100;
+    el.statAccuracy.textContent = `Accuracy: ${acc}%`;
+    el.statAvgTime.textContent = `Avg time: ${computeAvgTime().toFixed(1)}s`;
+    el.statLayout.textContent = `Layout: ${state.lastLayout}`;
+
+    const mastery = checkMastery(false);
+    el.statMastery.textContent = mastery.passed ? "Mastery: PASS" : "Mastery: Not yet";
+    el.statMastery.className = "pill " + (mastery.passed ? "ok" : "");
+  }
+
+  function digitNoCarry(a, b) {
+    let aa = a, bb = b;
+    while (aa > 0 || bb > 0) {
+      const da = aa % 10, db = bb % 10;
+      if (da + db >= 10) return false;
+      aa = Math.floor(aa / 10);
+      bb = Math.floor(bb / 10);
+    }
+    return true;
+  }
+  function digitNoBorrow(a, b) {
+    let aa = a, bb = b;
+    while (aa > 0 || bb > 0) {
+      const da = aa % 10, db = bb % 10;
+      if (da < db) return false;
+      aa = Math.floor(aa / 10);
+      bb = Math.floor(bb / 10);
+    }
+    return true;
+  }
+
+  function generateAdd(step) {
+    let a, b;
+    for (let i = 0; i < 140; i++) {
+      a = randInt(step.a[0], step.a[1]);
+      b = randInt(step.b[0], step.b[1]);
+      if (step.carry === "no" && !digitNoCarry(a,b)) continue;
+      if (step.carry === "mostly_no" && Math.random() < 0.75 && !digitNoCarry(a,b)) continue;
+      return { a, b, op:"+", type:"add", answer: a + b };
+    }
+    return { a, b, op:"+", type:"add", answer: a + b };
+  }
+
+  function generateSub(step) {
+    let a, b;
+    for (let i = 0; i < 170; i++) {
+      a = randInt(step.a[0], step.a[1]);
+      b = randInt(step.b[0], step.b[1]);
+      if (b > a) [a,b] = [b,a];
+      if (step.borrow === "no" && !digitNoBorrow(a,b)) continue;
+      if (step.borrow === "mostly_no" && Math.random() < 0.75 && !digitNoBorrow(a,b)) continue;
+      return { a, b, op:"−", type:"sub", answer: a - b };
+    }
+    return { a, b, op:"−", type:"sub", answer: a - b };
+  }
+
+  function generateMul(step) {
+    const a = randInt(step.a[0], step.a[1]);
+    const b = randInt(step.b[0], step.b[1]);
+    return { a, b, op:"×", type:"mul", answer: a * b };
+  }
+
+  function generateDiv(step) {
+    const divisor = randInt(step.divisor[0], step.divisor[1]);
+    const quotient = randInt(step.quotient[0], step.quotient[1]);
+    const dividend = divisor * quotient;
+    return { a: dividend, b: divisor, op:"÷", type:"div", answer: quotient };
+  }
+
+  function pickOp(step) {
+    const ops = step.ops;
+    return ops[randInt(0, ops.length - 1)];
+  }
+
+  function generateProblemFromStep(step) {
+    const op = pickOp(step);
+    if (op === "add") return generateAdd(step);
+    if (op === "sub") return generateSub(step);
+    if (op === "mul") return generateMul(step);
+    return generateDiv(step);
+  }
+
+  function chooseLayout(problem) {
+    const big = (String(problem.a).length >= 4 || String(problem.b).length >= 4);
+    const canVertical = !big;
+    if (!canVertical) return "horizontal";
+    return (Math.random() < 0.55) ? "vertical" : "horizontal";
+  }
+
+  function renderProblem(problem) {
+    const layout = chooseLayout(problem);
+    state.lastLayout = layout === "vertical" ? "Vertical" : "Horizontal";
+
+    el.eqH.style.display = "none";
+    el.eqVWrap.style.display = "none";
+
+    if (layout === "horizontal") {
+      el.eqH.textContent = `${problem.a} ${problem.op} ${problem.b} =`;
+      el.eqH.style.display = "block";
+    } else {
+      el.vTop.textContent = String(problem.a);
+      el.vBottom.textContent = String(problem.b);
+      el.vOp.textContent = problem.op;
+      el.eqVWrap.style.display = "block";
+    }
+  }
+
+  function checkMastery(showMessage) {
+    const step = getSelectedStepObj();
+    const acc = state.total ? (state.correct / state.total) : 1;
+    const avg = computeAvgTime();
+    const enoughAttempts = state.total >= Math.min(state.setTarget, 10);
+    const passed = enoughAttempts && acc >= step.mastery.acc && avg > 0 && avg <= step.mastery.time;
+
+    if (showMessage) {
+      if (passed) setFeedback(`Mastery PASS.`, "okText");
+      else setFeedback(`To pass: ≥${Math.round(step.mastery.acc*100)}% and ≤${step.mastery.time}s avg time.`, "");
+    }
+    return { passed, acc, avg };
+  }
+
+  function maybeAutoAdvance() {
+    if (!state.autoAdvance) return;
+    const g = Number(el.grade.value);
+    const idx = Number(el.step.value);
+    const steps = STEPS[g];
+    const mastery = checkMastery(false);
+
+    if (mastery.passed && !state.passedThisWorksheet) {
+      state.passedThisWorksheet = true;
+      if (idx < steps.length - 1) {
+        setFeedback(`Mastery PASS. Moving to next step.`, "okText");
+        el.step.value = String(idx + 1);
+        updateStepDescription();
+      } else {
+        setFeedback(`Mastery PASS. Finished this grade’s steps.`, "okText");
+      }
+    }
+  }
+
+  function startWorksheet() {
+    state.started = true;
+    state.setTarget = clamp(Number(el.targetCount.value || 20), 5, 100);
+    state.setDone = 0;
+    state.streak = 0;
+    state.perProblemTimes = [];
+    state.problemStartTs = null;
+    state.passedThisWorksheet = false;
+
+    nextProblem(true);
+    updateStepDescription();
+    updateStats();
+  }
+
+  function finishWorksheetAndLog() {
+    const step = getSelectedStepObj();
+    const mastery = checkMastery(false);
+    const accPct = state.total ? Math.round((state.correct / state.total) * 100) : 100;
+    const avgTime = computeAvgTime();
+
+    addHistoryEntry({
+      date: todayISO(),
+      ts: Date.now(),
+      grade: Number(el.grade.value),
+      stepId: step.id,
+      stepName: step.name,
+      letter: step.letter,
+      problems: state.setTarget,
+      attempts: state.total,
+      correct: state.correct,
+      accuracyPct: accPct,
+      avgTime: Number(avgTime.toFixed(1)),
+      masteryPassed: mastery.passed
+    });
+
+    renderHistory();
+  }
+
+  function nextProblem(isNewSheet=false) {
+    if (!state.started) return;
+
+    if (!isNewSheet && state.setDone >= state.setTarget) {
+      checkMastery(true);
+      finishWorksheetAndLog();
+      maybeAutoAdvance();
+      updateStats();
+
+      el.eqH.textContent = "Worksheet done!";
+      el.eqH.style.display = "block";
+      el.eqVWrap.style.display = "none";
+      state.current = null;
+      return;
+    }
+
+    const step = getSelectedStepObj();
+    state.current = generateProblemFromStep(step);
+    renderProblem(state.current);
+
+    el.answer.value = "";
+    state.problemStartTs = performance.now();
+    setFeedback("", "");
+
+    updateStepDescription();
+    updateStats();
+
+    safeFocusAnswer();
+  }
+
+  function checkAnswer() {
+    if (!state.current) return;
+
+    const raw = (el.answer.value || "").trim();
+    if (!/^-?\d+$/.test(raw)) {
+      setFeedback("Type a number.", "badText");
+      safeFocusAnswer();
+      return;
+    }
+
+    const userAns = Number(raw);
+    const correctAns = state.current.answer;
+
+    const dt = state.problemStartTs ? (performance.now() - state.problemStartTs) / 1000 : 0;
+    state.total += 1;
+    state.perProblemTimes.push(dt);
+
+    if (userAns === correctAns) {
+      state.correct += 1;
+      state.streak += 1;
+      state.setDone += 1;
+      setFeedback(`Correct. (${dt.toFixed(1)}s)`, "okText");
+      updateStats();
+      setTimeout(() => nextProblem(false), 360);
+    } else {
+      state.streak = 0;
+      state.setDone += 1;
+      setFeedback(`Not quite. Answer is ${correctAns}.`, "badText");
+      updateStats();
+      setTimeout(() => nextProblem(false), 700);
+    }
+  }
+
+  function skipProblem() {
+    if (!state.current) return;
+    state.total += 1;
+    state.streak = 0;
+    state.setDone += 1;
+    setFeedback(`Skipped. Answer was ${state.current.answer}.`, "badText");
+    updateStats();
+    setTimeout(() => nextProblem(false), 560);
+  }
+
+  function resetStats() {
+    state.correct = 0;
+    state.total = 0;
+    state.streak = 0;
+    state.perProblemTimes = [];
+    state.passedThisWorksheet = false;
+    updateStats();
+    setFeedback("Stats reset.", "");
+    safeFocusAnswer();
+  }
+
+  // ================= Printable worksheets =================
+  function buildPrintProblems(count) {
+    const step = getSelectedStepObj();
+    const probs = [];
+    for (let i = 0; i < count; i++) {
+      const p = generateProblemFromStep(step);
+      const printLayout = (Math.random() < 0.40) ? "V" : "H";
+      probs.push({ ...p, printLayout });
+    }
+    return probs;
+  }
+
+  function renderPrintProblemHTML(p, idx) {
+    if (p.printLayout === "H") {
+      const expr = `${p.a} ${p.op} ${p.b} = `;
+      return `<div class="pProbH">${idx+1}. ${expr}<span class="pBlank"></span></div>`;
+    }
+
+    const top = String(p.a);
+    const bottom = String(p.b);
+    const op = p.op;
+
+    return `
+      <div class="pProbV">
+        <div style="opacity:.95; font-size: 11pt; font-weight:800;">${idx+1}.</div>
+        <div class="pVRow">${top}</div>
+        <div class="pVRow op"><span class="opLeft">${op}</span><span class="numRight">${bottom}</span></div>
+        <div class="pVLine"></div>
+        <div class="pVAnswer"><span class="pVBlank"></span></div>
+      </div>
+    `;
+  }
+
+  function renderPrintSheet() {
+    const step = getSelectedStepObj();
+    const g = Number(el.grade.value);
+    const count = clamp(Number(el.targetCount.value || 20), 5, 100);
+    const probs = buildPrintProblems(count);
+    const dateStr = todayISO();
+
+    const rows = probs.map((p, idx) => renderPrintProblemHTML(p, idx)).join("");
+
+    el.printArea.innerHTML = `
+      <div class="pSheet">
+        <div class="pHeader">
+          <div class="pTitle">Math Worksheet</div>
+          <div class="pMeta">Date: ${dateStr}<br/>Grade ${g} | ${step.id} (${step.letter})</div>
+        </div>
+        <div class="pLine"></div>
+        <div class="pInfo">
+          <div>Name: __________________________</div>
+          <div>Time: _____________   Score: ______ / ${count}</div>
+        </div>
+        <div class="pGrid">
+          ${rows}
+        </div>
+        <div class="pFooter">
+          <div>Step: ${step.name}</div>
+          <div>Accuracy first, then speed.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function printWorksheet() {
+    renderPrintSheet();
+    setTimeout(() => window.print(), 50);
+  }
+
+  // ================= History rendering =================
+  function renderHistory() {
+    const hist = loadHistory();
+    const filter = state.historyFilter;
+    const today = todayISO();
+    const view = (filter === "today") ? hist.filter(h => h.date === today) : hist;
+
+    if (!view.length) {
+      el.historyList.innerHTML = `<div class="smallNote">No history yet. Finish a worksheet to log it.</div>`;
+      return;
+    }
+
+    el.historyList.innerHTML = view.slice(0, 25).map(h => {
+      const pass = h.masteryPassed;
+      const tagClass = pass ? "pass" : "fail";
+      const tagText = pass ? "PASS" : "TRY AGAIN";
+      const timeText = (typeof h.avgTime === "number") ? `${h.avgTime}s` : "-";
+      const accText = (typeof h.accuracyPct === "number") ? `${h.accuracyPct}%` : "-";
+      const when = new Date(h.ts || Date.now());
+      const hh = String(when.getHours()).padStart(2,"0");
+      const mm = String(when.getMinutes()).padStart(2,"0");
+      return `
+        <div class="histItem">
+          <div class="histLeft">
+            <span class="tag ${tagClass}">${tagText}</span>
+            <span class="tag">G${h.grade}</span>
+            <span class="tag">${h.stepId}</span>
+            <span style="opacity:.9;">${h.stepName}</span>
+          </div>
+          <div style="opacity:.92; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <span class="tag">${h.date} ${hh}:${mm}</span>
+            <span class="tag">Acc ${accText}</span>
+            <span class="tag">Avg ${timeText}</span>
+            <span class="tag">${h.problems} problems</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Events (touch-friendly)
+  el.startBtn.addEventListener('click', startWorksheet);
+  el.checkBtn.addEventListener('click', checkAnswer);
+  el.nextBtn.addEventListener('click', () => nextProblem(false));
+  el.skipBtn.addEventListener('click', skipProblem);
+  el.resetStatsBtn.addEventListener('click', resetStats);
+  el.printBtn.addEventListener('click', printWorksheet);
+
+  el.toggleAutoAdvanceBtn.addEventListener('click', () => {
+    state.autoAdvance = !state.autoAdvance;
+    el.toggleAutoAdvanceBtn.textContent = `Auto-Advance: ${state.autoAdvance ? "ON" : "OFF"}`;
+    safeFocusAnswer();
+  });
+
+  el.grade.addEventListener('change', () => {
+    updateStepDropdown();
+    state.passedThisWorksheet = false;
+    updateStats();
+    renderHistory();
+    if (state.started) startWorksheet();
+  });
+
+  el.step.addEventListener('change', () => {
+    updateStepDescription();
+    state.passedThisWorksheet = false;
+    updateStats();
+    if (state.started) startWorksheet();
+  });
+
+  // iPad keyboard "Done" support (keydown + keyup for reliability)
+  el.answer.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+  el.answer.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  // Prevent accidental scroll jumps when tapping around on iOS
+  document.addEventListener('touchend', (e) => {
+    const t = e.target;
+    const isInteractive = t && (t.tagName === "BUTTON" || t.tagName === "SELECT" || t.id === "answer" || t.tagName === "INPUT");
+    if (!isInteractive && state.started && state.current) safeFocusAnswer();
+  }, { passive: true });
+
+  // History filter buttons
+  document.getElementById('todayOnlyBtn').addEventListener('click', () => { state.historyFilter = "today"; renderHistory(); safeFocusAnswer(); });
+  document.getElementById('allHistoryBtn').addEventListener('click', () => { state.historyFilter = "all"; renderHistory(); safeFocusAnswer(); });
+  document.getElementById('clearHistoryBtn').addEventListener('click', () => { localStorage.removeItem(HISTORY_KEY); renderHistory(); safeFocusAnswer(); });
+
+  // Session clock
+  setInterval(() => {
+    const s = Math.floor((Date.now() - state.sessionStartTs) / 1000);
+    const mm = Math.floor(s / 60);
+    const ss = String(s % 60).padStart(2, '0');
+    el.sessionClock.textContent = `Session: ${mm}:${ss}`;
+  }, 500);
+
+  // Init
+  updateStepDropdown();
+  updateStepDescription();
+  updateStats();
+  renderHistory();
+
+  // If opened on iPad, give a helpful initial focus once user interacts.
+  document.addEventListener('click', () => {
+    if (state.started && state.current) safeFocusAnswer();
+  }, { once: true });
+})();
+</script>
+</body>
+</html>
