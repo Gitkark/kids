@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- iPad / iOS web-app friendliness -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <title>Reading + Phonics (Grades 1–4)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0b1020; color: #e9ecf5; -webkit-text-size-adjust: 100%; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px; }
+
+    button, select, input {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    header { display:flex; gap:14px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
+
+    .panel {
+      margin-top: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .controls {
+      display:grid;
+      grid-template-columns: 1.3fr 1.3fr 1fr 1.2fr;
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 980px) { .controls { grid-template-columns: 1fr 1fr; } }
+
+    label { display:grid; gap:7px; font-size:13px; color: rgba(233,236,245,0.94); }
+    select, button, input[type="number"], input[type="text"] {
+      background: rgba(0,0,0,0.35);
+      color: #e9ecf5;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 16px; /* prevents iOS auto-zoom */
+      min-height: 48px;
+    }
+    button { cursor:pointer; font-weight: 850; user-select:none; -webkit-user-select:none; }
+    button.primary { background: rgba(64,140,255,0.42); border-color: rgba(64,140,255,0.80); }
+    button:active { transform: translateY(1px); }
+
+    .rowBtns { display:flex; gap:10px; flex-wrap:wrap; }
+    .smallNote { font-size:12px; opacity:0.84; font-weight:650; margin-top:5px; }
+
+    .stats { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 14px;
+      color: rgba(233,236,245,0.95);
+      font-weight: 780;
+    }
+    .pill.ok { border-color: rgba(120,255,176,0.55); }
+    .pill.fail { border-color: rgba(255,138,161,0.55); }
+
+    .grid2 { display:grid; grid-template-columns: 1.35fr 0.95fr; gap:12px; margin-top:12px; }
+    @media (max-width: 980px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .card {
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      padding: 14px;
+    }
+
+    .stepTitle { font-size: 13px; opacity: 0.92; font-weight: 850; text-align:center; margin-bottom: 8px; }
+
+    .contentBox {
+      width: 100%;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px;
+    }
+
+    .modeRow {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .modeBadge {
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.95;
+    }
+
+    .visualRow {
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .visualRow { grid-template-columns: 1fr; } }
+
+    .bigText {
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      line-height: 1.28;
+      font-size: 30px;
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .illustration {
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+    }
+    .illustration svg { width: 100%; height: auto; display:block; }
+
+    .qaWrap { margin-top: 12px; display:grid; gap:10px; }
+    .question { font-size: 18px; font-weight: 900; }
+    .choices { display:grid; gap:10px; }
+    .choiceBtn {
+      text-align:left;
+      padding: 14px;
+      min-height: 56px;
+      border-radius: 16px;
+      font-weight: 850;
+    }
+    .choiceBtn.correct { border-color: rgba(120,255,176,0.55); background: rgba(120,255,176,0.12); }
+    .choiceBtn.wrong { border-color: rgba(255,138,161,0.55); background: rgba(255,138,161,0.10); }
+
+    .answerRow { margin-top: 10px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center; }
+    .answerRow button { min-width: 150px; }
+
+    .feedback { min-height: 28px; text-align:center; font-size: 18px; font-weight: 900; margin-top: 10px; }
+    .okText { color: #78ffb0; }
+    .badText { color: #ff8aa1; }
+    .hint { color: rgba(233,236,245,0.82); font-size: 14px; text-align:center; margin-top: 6px; font-weight: 720; }
+
+    .timerRow { display:flex; gap:10px; flex-wrap: wrap; justify-content:center; margin-top: 10px; }
+    .timerBtn { min-width: 160px; }
+
+    .historyHeader { display:flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap:10px; }
+    .historyTitle { font-size: 15px; font-weight: 900; }
+    .historyList { margin-top: 10px; display:grid; gap:10px; }
+    .histItem {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      padding: 11px 11px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-weight: 720;
+      font-size: 13px;
+    }
+    .histLeft { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.95;
+    }
+    .tag.pass { border-color: rgba(120,255,176,0.55); }
+    .tag.fail { border-color: rgba(255,138,161,0.55); }
+
+    /* Print */
+    #printArea { display:none; }
+    @media print {
+      body { background:#fff; color:#000; }
+      .wrap, header, .panel, .grid2, .card { display:none !important; }
+      #printArea { display:block !important; }
+      #printArea * { color:#000 !important; }
+
+      .pSheet { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 18mm; }
+      .pHeader { display:flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+      .pTitle { font-size: 16pt; font-weight: 900; }
+      .pMeta { font-size: 10.5pt; font-weight: 720; text-align:right; }
+      .pLine { border-top: 2px solid #000; margin: 10px 0 12px; }
+      .pInfo { display:flex; justify-content: space-between; font-size: 11pt; font-weight: 720; margin-bottom: 10px; }
+      .pBlock { margin-bottom: 10mm; }
+      .pMode { font-size: 12pt; font-weight: 900; margin-bottom: 3mm; }
+      .pText { font-size: 14pt; line-height: 1.4; white-space: pre-wrap; }
+      .pQ { margin-top: 4mm; font-size: 12pt; font-weight: 900; }
+      .pBlank { display:inline-block; min-width: 120mm; border-bottom: 2px solid #000; transform: translateY(-2px); }
+      .pFooter { margin-top: 10mm; font-size: 10pt; font-weight: 720; display:flex; justify-content: space-between; }
+      .pNote { font-size: 10pt; font-weight: 720; margin-top: 2mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Reading + Phonics (Grades 1–4)</h1>
+      <div class="pill" id="sessionClock">Session: 0:00</div>
+    </header>
+
+    <div class="panel">
+      <div class="controls">
+        <label>
+          Grade
+          <select id="grade">
+            <option value="1">Grade 1</option>
+            <option value="2" selected>Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+          </select>
+          <div class="smallNote">Each grade has A/B/C steps and phonics practice.</div>
+        </label>
+
+        <label>
+          Step (A/B/C)
+          <select id="step"></select>
+          <div class="smallNote" id="stepDesc"></div>
+        </label>
+
+        <label>
+          Items per worksheet
+          <input id="targetCount" type="number" min="5" max="50" value="10" />
+          <div class="smallNote">Each item is phonics, words, sentence, or passage.</div>
+        </label>
+
+        <div style="display:grid; gap:10px;">
+          <button class="primary" id="startBtn">Start / New Worksheet</button>
+          <div class="rowBtns">
+            <button id="printBtn">Print Worksheet</button>
+            <button id="skipBtn">Skip</button>
+            <button id="resetStatsBtn">Reset Stats</button>
+            <button id="toggleAutoAdvanceBtn">Auto-Advance: ON</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="pill" id="statProgress">Worksheet: 0/10</div>
+        <div class="pill" id="statAccuracy">Accuracy: 100%</div>
+        <div class="pill" id="statAvgTime">Avg time: 0.0s</div>
+        <div class="pill" id="statFluency">Timer: off</div>
+        <div class="pill" id="statMastery">Mastery: Not yet</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="stepTitle" id="stepTitle">Press Start</div>
+
+        <div class="contentBox">
+          <div class="modeRow">
+            <span class="modeBadge" id="modeBadge">Mode</span>
+            <span class="pill" id="itemKindPill">Item: -</span>
+          </div>
+
+          <div class="visualRow">
+            <div>
+              <div class="bigText" id="readingText">Press Start to begin.</div>
+
+              <div class="timerRow">
+                <button class="timerBtn" id="startTimerBtn">Start 1-min Timer</button>
+                <button class="timerBtn" id="stopTimerBtn">Stop Timer</button>
+                <div class="pill" id="timerPill">Timer: 0:00</div>
+              </div>
+
+              <div class="qaWrap" id="qaWrap" style="display:none;">
+                <div class="question" id="questionText"></div>
+                <div class="choices" id="choices"></div>
+              </div>
+
+              <div class="answerRow">
+                <button class="primary" id="markCorrectBtn">Mark Correct</button>
+                <button id="markWrongBtn">Mark Incorrect</button>
+                <button id="nextBtn">Next</button>
+              </div>
+
+              <div class="feedback" id="feedback"></div>
+              <div class="hint">For fluency, start the timer and read out loud. For questions, tap an answer.</div>
+            </div>
+
+            <div class="illustration" id="illustrationBox" aria-label="Picture"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="historyHeader">
+          <div class="historyTitle">Daily worksheet history</div>
+          <div class="rowBtns">
+            <button id="todayOnlyBtn">Today</button>
+            <button id="allHistoryBtn">All</button>
+            <button id="clearHistoryBtn">Clear history</button>
+          </div>
+        </div>
+        <div class="smallNote">Saved in this browser (localStorage). Each completed worksheet is logged.</div>
+        <div class="historyList" id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="printArea"></div>
+
+<script>
+(() => {
+  // ===================== CONTENT =====================
+  // WORD BANK (fluency)
+  const WORD_BANK = {
+    1: { A:["a","I","see","the","to","and","is","in","it","on","at","we","go","me","my","up","can","like","am","you"],
+         B:["with","this","that","have","said","look","come","here","play","from","little","down","help","make","jump","blue","yellow","happy","rain"],
+         C:["because","before","after","around","people","friend","family","animal","school","morning","picture","today","tomorrow","together","outside","different"] },
+    2: { A:["always","better","suddenly","quiet","laugh","smile","answer","almost","carry","finish","inside","maybe","often","paper","second","simple"],
+         B:["between","careful","decide","excited","favorite","follow","garden","happen","listen","middle","perfect","problem","remember","sentence","weather"],
+         C:["adventure","building","discover","energy","especially","important","language","measure","practice","protect","question","surprise","whisper","wonder"] },
+    3: { A:["compare","complete","curious","direction","example","fraction","imagine","information","notice","pattern","predict","support","topic","unusual"],
+         B:["conclusion","concentrate","confidence","environment","excellent","experience","investigate","knowledge","material","opinion","possible","solution","specific"],
+         C:["challenge","character","communication","community","experiment","incredible","independent","observation","opportunity","responsible","technology","valuable"] },
+    4: { A:["analyze","beneficial","calculate","evidence","function","identify","increase","industry","paragraph","process","research","structure","strategy"],
+         B:["consequence","contribute","development","efficient","generation","hypothesis","instrument","interpret","organization","perspective","significant"],
+         C:["accomplish","approximately","collaboration","distribution","extraordinary","fundamental","implementation","optimization","productivity","recommendation"] }
+  };
+
+  // SENTENCE CLOZE (choose the best word)
+  const SENTENCE_TEMPLATES = {
+    1: [
+      { t:"I see a ___ .", blanks:["cat","dog","hat","bus","sun","cup"] },
+      { t:"The ___ is big.", blanks:["dog","tree","ball","fish","kite","cake"] },
+      { t:"We can ___ .", blanks:["run","hop","play","read","swim","draw"] },
+      { t:"I like the ___ .", blanks:["rain","sun","book","song","game","cake"] }
+    ],
+    2: [
+      { t:"Yesterday we ___ to the park.", blanks:["walked","ran","rode","went"] },
+      { t:"Please ___ the directions carefully.", blanks:["follow","read","check","listen to"] },
+      { t:"The puppy felt ___ after the nap.", blanks:["happy","better","calm","quiet"] },
+      { t:"I can ___ the problem in two steps.", blanks:["solve","finish","explain","check"] }
+    ],
+    3: [
+      { t:"The scientist will ___ the results.", blanks:["analyze","compare","record","explain"] },
+      { t:"We noticed a ___ in the data.", blanks:["pattern","change","trend","difference"] },
+      { t:"Please ___ your answer with evidence.", blanks:["support","prove","back up","justify"] },
+      { t:"The team will ___ a solution together.", blanks:["design","build","test","improve"] }
+    ],
+    4: [
+      { t:"A good paragraph includes a clear ___.", blanks:["topic","purpose","argument","claim"] },
+      { t:"Engineers try to ___ a process.", blanks:["optimize","improve","simplify","measure"] },
+      { t:"The author explains the ___ of the decision.", blanks:["consequence","impact","result","outcome"] },
+      { t:"We should consider a different ___.", blanks:["perspective","approach","strategy","method"] }
+    ]
+  };
+
+  // PHONICS BANKS
+  // Drill types:
+  // 1) "grapheme_sound": choose the word that matches a letter pattern (sh, ch, th, ee, oa, igh, ar, or, er)
+  // 2) "cvc_blend": blend CVC (c-a-t => cat) choose the correct word
+  // 3) "blend_cluster": choose a word with an initial blend (st, bl, cr, fr, tr)
+  // 4) "morphology": choose correct meaning/word with prefix/suffix (grade 4)
+  const PHONICS = {
+    1: {
+      A: { type:"cvc_blend", sets:[
+        { letters:["c","a","t"], correct:"cat", choices:["cat","cot","cut","cap"] },
+        { letters:["p","i","n"], correct:"pin", choices:["pan","pin","pen","pun"] },
+        { letters:["s","u","n"], correct:"sun", choices:["sin","sun","son","san"] },
+        { letters:["m","a","p"], correct:"map", choices:["map","mop","mip","mup"] }
+      ]},
+      B: { type:"grapheme_sound", sets:[
+        { pattern:"sh", prompt:"Tap the word that has “sh”.", correct:"ship", choices:["ship","sip","chip","lip"] },
+        { pattern:"ch", prompt:"Tap the word that has “ch”.", correct:"chip", choices:["ship","chip","tip","lip"] },
+        { pattern:"th", prompt:"Tap the word that has “th”.", correct:"thin", choices:["tin","thin","shin","fin"] },
+        { pattern:"ck", prompt:"Tap the word that has “ck”.", correct:"duck", choices:["duck","duk","dust","dunk"] }
+      ]},
+      C: { type:"cvc_blend", sets:[
+        { letters:["b","a","t"], correct:"bat", choices:["bat","bet","bit","but"] },
+        { letters:["f","o","x"], correct:"fox", choices:["fax","fix","fox","fex"] },
+        { letters:["r","e","d"], correct:"red", choices:["rid","rod","red","rad"] },
+        { letters:["h","o","p"], correct:"hop", choices:["hop","hep","hip","hup"] }
+      ]}
+    },
+    2: {
+      A: { type:"blend_cluster", sets:[
+        { blend:"st", prompt:"Tap a word that starts with “st”.", correct:"star", choices:["star","car","tar","bar"] },
+        { blend:"bl", prompt:"Tap a word that starts with “bl”.", correct:"blue", choices:["blue","glue","clue","flue"] },
+        { blend:"cr", prompt:"Tap a word that starts with “cr”.", correct:"crab", choices:["grab","crab","cab","cram"] },
+        { blend:"fr", prompt:"Tap a word that starts with “fr”.", correct:"frog", choices:["frog","log","fog","flag"] }
+      ]},
+      B: { type:"grapheme_sound", sets:[
+        { pattern:"ee", prompt:"Tap the word with long e “ee”.", correct:"seed", choices:["sad","seed","sand","said"] },
+        { pattern:"oa", prompt:"Tap the word with “oa”.", correct:"boat", choices:["bait","boat","boot","beat"] },
+        { pattern:"igh", prompt:"Tap the word with “igh”.", correct:"light", choices:["lift","left","light","late"] },
+        { pattern:"ar", prompt:"Tap the word with “ar”.", correct:"farm", choices:["form","from","farm","firm"] }
+      ]},
+      C: { type:"cvc_blend", sets:[
+        { letters:["s","l","a","m"], prompt:"Blend the sounds. Tap the word.", correct:"slam", choices:["slam","slim","slam","slab"] },
+        { letters:["t","r","i","p"], prompt:"Blend the sounds. Tap the word.", correct:"trip", choices:["trap","trip","trop","drip"] },
+        { letters:["b","r","a","g"], prompt:"Blend the sounds. Tap the word.", correct:"brag", choices:["bag","brag","brag","brig"] },
+        { letters:["c","l","a","p"], prompt:"Blend the sounds. Tap the word.", correct:"clap", choices:["cap","clap","clip","clop"] }
+      ]}
+    },
+    3: {
+      A: { type:"grapheme_sound", sets:[
+        { pattern:"er", prompt:"Tap the word with “er”.", correct:"herd", choices:["hard","heard","herd","hid"] },
+        { pattern:"or", prompt:"Tap the word with “or”.", correct:"storm", choices:["steam","storm","starm","stir"] },
+        { pattern:"tion", prompt:"Tap the word with “tion”.", correct:"station", choices:["stated","station","staying","staring"] },
+        { pattern:"ea", prompt:"Tap the word where “ea” says /ee/.", correct:"each", choices:["each","earn","earth","easy"] }
+      ]},
+      B: { type:"blend_cluster", sets:[
+        { blend:"tr", prompt:"Tap a word that starts with “tr”.", correct:"travel", choices:["travel","ravel","table","trail"] },
+        { blend:"spl", prompt:"Tap a word that starts with “spl”.", correct:"splash", choices:["slash","splash","stash","smash"] },
+        { blend:"str", prompt:"Tap a word that starts with “str”.", correct:"street", choices:["sweet","street","sheet","steel"] },
+        { blend:"scr", prompt:"Tap a word that starts with “scr”.", correct:"screen", choices:["screen","seen","green","scream"] }
+      ]},
+      C: { type:"morphology", sets:[
+        { prompt:"What does “re-” usually mean?", correct:"again", choices:["again","not","small","before"] },
+        { prompt:"What does “un-” usually mean?", correct:"not", choices:["not","again","between","under"] },
+        { prompt:"What does “-ful” usually mean?", correct:"full of", choices:["full of","past tense","one who","able to"] },
+        { prompt:"What does “-less” usually mean?", correct:"without", choices:["without","before","more than","under"] }
+      ]}
+    },
+    4: {
+      A: { type:"morphology", sets:[
+        { prompt:"“predict” means…", correct:"say before", choices:["say before","say again","say after","say less"] },
+        { prompt:"“transport” means…", correct:"carry across", choices:["carry across","carry down","carry back","carry under"] },
+        { prompt:"“rebuild” means…", correct:"build again", choices:["build again","build smaller","build under","build before"] },
+        { prompt:"“misread” means…", correct:"read wrong", choices:["read wrong","read quickly","read quietly","read first"] }
+      ]},
+      B: { type:"grapheme_sound", sets:[
+        { pattern:"ph", prompt:"Tap the word where “ph” says /f/.", correct:"photo", choices:["photo","piano","phone","pony"] },
+        { pattern:"ough", prompt:"Tap the word with “ough”.", correct:"though", choices:["that","then","through","though"] },
+        { pattern:"dge", prompt:"Tap the word with “dge”.", correct:"bridge", choices:["bring","bridge","bright","bride"] },
+        { pattern:"tion", prompt:"Tap the word with “tion”.", correct:"action", choices:["actor","active","action","acting"] }
+      ]},
+      C: { type:"morphology", sets:[
+        { prompt:"“collaboration” is closest to…", correct:"working together", choices:["working together","working alone","working slowly","working silently"] },
+        { prompt:"“inefficient” means…", correct:"not efficient", choices:["not efficient","very efficient","more efficient","almost efficient"] },
+        { prompt:"“disagree” means…", correct:"not agree", choices:["not agree","agree quickly","agree again","agree later"] },
+        { prompt:"“investigation” is…", correct:"careful study", choices:["careful study","quick guess","loud speech","short story"] }
+      ]}
+    }
+  };
+
+  // PASSAGES with themes for built-in SVG illustrations
+  const PASSAGES = {
+    1: [
+      { theme:"rain", title:"A Rainy Walk",
+        text:"It is raining. Mia puts on her boots. She walks to the door. Splash! The puddle is big. Mia smiles.",
+        q:{ question:"Why does Mia put on boots?", choices:["Because it is raining","Because it is snowing","Because it is hot","Because it is dark"], answerIndex:0 } },
+      { theme:"couch", title:"The Lost Ball",
+        text:"A ball rolls under the couch. Ben looks left and right. He uses a flashlight. He finds the ball and cheers.",
+        q:{ question:"Where does the ball roll?", choices:["Under the couch","Into the sink","On the roof","Behind the tree"], answerIndex:0 } },
+      { theme:"pet", title:"A New Pet",
+        text:"Tara feeds her fish each morning. The fish swims in circles. Tara taps the glass gently. The fish wiggles its tail.",
+        q:{ question:"What does Tara do each morning?", choices:["Feeds the fish","Cleans the roof","Paints the glass","Hides the tail"], answerIndex:0 } },
+      { theme:"kite", title:"Kite Day",
+        text:"The wind is strong. Leo holds the kite string. The kite rises up high. Leo runs and laughs.",
+        q:{ question:"What helps the kite go up?", choices:["The wind","The sand","The snow","The puddle"], answerIndex:0 } }
+    ],
+    2: [
+      { theme:"garden", title:"The Garden Plan",
+        text:"Lena wants a small garden. She draws a plan on paper. She plants seeds in rows. Each day she waters them and checks for sprouts.",
+        q:{ question:"What does Lena do each day?", choices:["Waters the seeds","Moves the rows","Hides the sprouts","Counts the paper"], answerIndex:0 } },
+      { theme:"neighbors", title:"A Helpful Neighbor",
+        text:"Mr. Kim carries a heavy box. Maya sees him and offers help. Together they carry it to the porch. Mr. Kim says thank you.",
+        q:{ question:"How do they solve the problem?", choices:["They work together","They ignore the box","They break the box","They hide the porch"], answerIndex:0 } },
+      { theme:"library", title:"Quiet Corner",
+        text:"In the library, Noor whispers to her friend. They pick a book about space. They sit in a quiet corner and read.",
+        q:{ question:"Where do they read?", choices:["In a quiet corner","On a noisy street","Inside a bus","Under a slide"], answerIndex:0 } },
+      { theme:"storm", title:"Storm Check",
+        text:"Dark clouds fill the sky. Jay checks the weather report. He decides to bring a jacket and stay near home.",
+        q:{ question:"Why does Jay bring a jacket?", choices:["Because dark clouds appear","Because the sun is bright","Because the day is hot","Because the sky is clear"], answerIndex:0 } }
+    ],
+    3: [
+      { theme:"bridge", title:"Testing a Bridge",
+        text:"A class builds a model bridge. First they predict how much weight it can hold. Then they add coins one at a time. They record the number of coins before the bridge bends.",
+        q:{ question:"What do they do after making a prediction?", choices:["Add coins one at a time","Paint the bridge blue","Throw away the coins","Stop the test"], answerIndex:0 } },
+      { theme:"weather", title:"A Pattern in Weather",
+        text:"For two weeks, Amir tracks the weather. He notices that clouds often arrive in the afternoon. He writes this pattern in a notebook and shares it with his class.",
+        q:{ question:"What pattern does Amir notice?", choices:["Clouds arrive in the afternoon","Snow falls every night","Rain stops forever","Wind disappears in winter"], answerIndex:0 } },
+      { theme:"robot", title:"Robot Helper",
+        text:"Kai programs a small robot to follow a line on the floor. The robot sometimes turns too early. Kai changes one setting and tests again. After a few tries, the robot moves smoothly.",
+        q:{ question:"How does Kai improve the robot?", choices:["Changes a setting and tests again","Stops testing forever","Unplugs the robot","Moves the floor"], answerIndex:0 } },
+      { theme:"recycle", title:"Recycling Team",
+        text:"A school wants less trash. Students place clear labels on bins. They teach younger kids what goes where. After a month, the school throws away fewer bottles.",
+        q:{ question:"What helps reduce trash?", choices:["Labels and teaching","Hiding the bins","Removing labels","Throwing more bottles"], answerIndex:0 } }
+    ],
+    4: [
+      { theme:"system", title:"Improving a System",
+        text:"A library wants shorter wait times. Staff measure how long checkouts take. They rearrange the counter and label shelves clearly. After a week, the average wait time decreases.",
+        q:{ question:"What helps reduce wait time?", choices:["Rearranging and labeling clearly","Removing all books","Closing the library","Hiding the shelves"], answerIndex:0 } },
+      { theme:"plants", title:"Evidence and Claims",
+        text:"A student claims that plants grow faster with more light. She tests two groups of plants, changing only the light. She measures growth and shows the results in a chart.",
+        q:{ question:"What makes her claim stronger?", choices:["Testing and measuring results","Guessing the answer","Changing many things at once","Skipping the chart"], answerIndex:0 } },
+      { theme:"city", title:"City Buses",
+        text:"A city wants buses to arrive on time. Engineers study traffic at busy intersections. They adjust signal timing and add bus-only lanes on one road. Late arrivals drop.",
+        q:{ question:"Which action supports on-time buses?", choices:["Adjusting signals and adding a bus lane","Making roads narrower","Stopping all buses","Removing signals"], answerIndex:0 } },
+      { theme:"lab", title:"A Careful Investigation",
+        text:"A team tests a new material. They change only one variable at a time. They repeat the test and compare results. This helps them trust the conclusion.",
+        q:{ question:"Why change one variable at a time?", choices:["To understand cause and effect","To make results random","To avoid repeating tests","To make it confusing"], answerIndex:0 } }
+    ]
+  };
+
+  // ===================== STEPS =====================
+  // Modes: phonics, words, sentence, passage
+  const STEPS = {
+    1: [
+      { letter:"A", id:"R1-A1", name:"A1: Phonics CVC", desc:"Blend simple CVC words.", mode:"phonics", mastery:{acc:0.90, time:10} },
+      { letter:"B", id:"R1-B1", name:"B1: Phonics digraphs", desc:"sh, ch, th, ck patterns.", mode:"phonics", mastery:{acc:0.88, time:12} },
+      { letter:"C", id:"R1-C1", name:"C1: Short passages", desc:"Read and answer one question.", mode:"passage", mastery:{acc:0.85, time:22} },
+    ],
+    2: [
+      { letter:"A", id:"R2-A1", name:"A1: Phonics blends", desc:"st, bl, cr, fr and more.", mode:"phonics", mastery:{acc:0.90, time:12} },
+      { letter:"B", id:"R2-B1", name:"B1: Words fluency", desc:"Read words smoothly.", mode:"words", mastery:{acc:0.90, time:12} },
+      { letter:"C", id:"R2-C1", name:"C1: Passage comprehension", desc:"Read a passage and answer.", mode:"passage", mastery:{acc:0.85, time:24} },
+    ],
+    3: [
+      { letter:"A", id:"R3-A1", name:"A1: Vowel teams", desc:"ee, oa, igh, ar, or, er.", mode:"phonics", mastery:{acc:0.88, time:14} },
+      { letter:"B", id:"R3-B1", name:"B1: Sentence meaning", desc:"Choose the best word.", mode:"sentence", mastery:{acc:0.85, time:18} },
+      { letter:"C", id:"R3-C1", name:"C1: Passages", desc:"Read and answer.", mode:"passage", mastery:{acc:0.85, time:26} },
+    ],
+    4: [
+      { letter:"A", id:"R4-A1", name:"A1: Prefixes", desc:"re-, mis-, pre-, trans-.", mode:"phonics", mastery:{acc:0.88, time:18} },
+      { letter:"B", id:"R4-B1", name:"B1: Advanced words", desc:"Academic vocabulary.", mode:"words", mastery:{acc:0.90, time:16} },
+      { letter:"C", id:"R4-C1", name:"C1: Informational passages", desc:"Read and answer.", mode:"passage", mastery:{acc:0.85, time:28} },
+    ]
+  };
+
+  // ===================== STORAGE =====================
+  const HISTORY_KEY = "kumon_reading_phonics_history_v1";
+
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+  function saveHistory(arr) { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
+  function addHistoryEntry(entry) {
+    const hist = loadHistory();
+    hist.unshift(entry);
+    if (hist.length > 120) hist.length = 120;
+    saveHistory(hist);
+  }
+
+  // ===================== STATE =====================
+  const state = {
+    current: null,
+    started: false,
+    setTarget: 10,
+    setDone: 0,
+    correct: 0,
+    total: 0,
+    perItemTimes: [],
+    itemStartTs: null,
+    sessionStartTs: Date.now(),
+    autoAdvance: true,
+    passedThisWorksheet: false,
+    historyFilter: "today",
+    timerRunning: false,
+    timerStart: 0,
+    timerInterval: null,
+  };
+
+  // ===================== ELEMENTS =====================
+  const el = {
+    grade: document.getElementById("grade"),
+    step: document.getElementById("step"),
+    stepDesc: document.getElementById("stepDesc"),
+    stepTitle: document.getElementById("stepTitle"),
+    targetCount: document.getElementById("targetCount"),
+    startBtn: document.getElementById("startBtn"),
+    printBtn: document.getElementById("printBtn"),
+    skipBtn: document.getElementById("skipBtn"),
+    resetStatsBtn: document.getElementById("resetStatsBtn"),
+    toggleAutoAdvanceBtn: document.getElementById("toggleAutoAdvanceBtn"),
+
+    statProgress: document.getElementById("statProgress"),
+    statAccuracy: document.getElementById("statAccuracy"),
+    statAvgTime: document.getElementById("statAvgTime"),
+    statFluency: document.getElementById("statFluency"),
+    statMastery: document.getElementById("statMastery"),
+    sessionClock: document.getElementById("sessionClock"),
+
+    modeBadge: document.getElementById("modeBadge"),
+    itemKindPill: document.getElementById("itemKindPill"),
+    readingText: document.getElementById("readingText"),
+    illustrationBox: document.getElementById("illustrationBox"),
+
+    qaWrap: document.getElementById("qaWrap"),
+    questionText: document.getElementById("questionText"),
+    choices: document.getElementById("choices"),
+
+    feedback: document.getElementById("feedback"),
+    markCorrectBtn: document.getElementById("markCorrectBtn"),
+    markWrongBtn: document.getElementById("markWrongBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+
+    startTimerBtn: document.getElementById("startTimerBtn"),
+    stopTimerBtn: document.getElementById("stopTimerBtn"),
+    timerPill: document.getElementById("timerPill"),
+
+    historyList: document.getElementById("historyList"),
+    todayOnlyBtn: document.getElementById("todayOnlyBtn"),
+    allHistoryBtn: document.getElementById("allHistoryBtn"),
+    clearHistoryBtn: document.getElementById("clearHistoryBtn"),
+
+    printArea: document.getElementById("printArea"),
+  };
+
+  // ===================== HELPERS =====================
+  const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+  const randInt = (min,maxInc) => Math.floor(Math.random()*(maxInc-min+1))+min;
+
+  function setFeedback(msg, kind) {
+    el.feedback.textContent = msg || "";
+    el.feedback.className = "feedback " + (kind || "");
+  }
+
+  function computeAvgTime() {
+    if (!state.perItemTimes.length) return 0;
+    const sum = state.perItemTimes.reduce((a,b)=>a+b,0);
+    return sum / state.perItemTimes.length;
+  }
+
+  function getSelectedStepObj() {
+    const g = Number(el.grade.value);
+    const idx = Number(el.step.value || 0);
+    return STEPS[g][idx];
+  }
+
+  function updateStepDropdown() {
+    const g = Number(el.grade.value);
+    const steps = STEPS[g];
+    el.step.innerHTML = "";
+    steps.forEach((s,i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = `${s.letter} | ${s.name}`;
+      el.step.appendChild(opt);
+    });
+    el.step.value = "0";
+    updateStepDescription();
+  }
+
+  function updateStepDescription() {
+    const s = getSelectedStepObj();
+    el.stepDesc.textContent = `${s.desc}  Mastery: ≥${Math.round(s.mastery.acc*100)}% and ≤${s.mastery.time.toFixed(0)}s avg`;
+    el.stepTitle.textContent = `${s.id}  |  ${s.desc}`;
+  }
+
+  function updateStats() {
+    el.statProgress.textContent = `Worksheet: ${state.setDone}/${state.setTarget}`;
+    const acc = state.total ? Math.round((state.correct / state.total) * 100) : 100;
+    el.statAccuracy.textContent = `Accuracy: ${acc}%`;
+    el.statAvgTime.textContent = `Avg time: ${computeAvgTime().toFixed(1)}s`;
+    el.statFluency.textContent = state.timerRunning ? "Timer: running" : "Timer: off";
+
+    const mastery = checkMastery(false);
+    el.statMastery.textContent = mastery.passed ? "Mastery: PASS" : "Mastery: Not yet";
+    el.statMastery.className = "pill " + (mastery.passed ? "ok" : "");
+  }
+
+  // ===================== ILLUSTRATIONS (INLINE SVG) =====================
+  function svgWrap(inner) {
+    return `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cartoon illustration">
+      <rect x="0" y="0" width="320" height="220" rx="18" fill="rgba(255,255,255,0.04)"/>
+      ${inner}
+    </svg>`;
+  }
+
+  function illustrationForTheme(theme) {
+    const sky = `<rect x="14" y="14" width="292" height="120" rx="16" fill="rgba(120,180,255,0.18)"/>`;
+    const ground = `<rect x="14" y="132" width="292" height="74" rx="16" fill="rgba(120,255,176,0.10)"/>`;
+
+    const themes = {
+      rain: svgWrap(`
+        ${sky}${ground}
+        <circle cx="60" cy="55" r="22" fill="rgba(255,255,255,0.22)"/>
+        <circle cx="82" cy="50" r="18" fill="rgba(255,255,255,0.22)"/>
+        <circle cx="102" cy="58" r="22" fill="rgba(255,255,255,0.22)"/>
+        <path d="M56 92 C56 82 70 82 70 92 C70 102 56 102 56 92 Z" fill="rgba(120,180,255,0.55)"/>
+        <path d="M86 98 C86 88 100 88 100 98 C100 108 86 108 86 98 Z" fill="rgba(120,180,255,0.55)"/>
+        <path d="M116 90 C116 80 130 80 130 90 C130 100 116 100 116 90 Z" fill="rgba(120,180,255,0.55)"/>
+        <ellipse cx="185" cy="178" rx="70" ry="18" fill="rgba(120,180,255,0.30)"/>
+        <circle cx="215" cy="150" r="18" fill="rgba(255,255,255,0.18)"/>
+        <rect x="205" y="168" width="20" height="28" rx="8" fill="rgba(255,255,255,0.18)"/>
+      `),
+      couch: svgWrap(`
+        ${sky}${ground}
+        <rect x="60" y="120" width="200" height="70" rx="18" fill="rgba(255,255,255,0.18)"/>
+        <rect x="70" y="108" width="180" height="32" rx="14" fill="rgba(255,255,255,0.16)"/>
+        <circle cx="110" cy="185" r="14" fill="rgba(255,180,120,0.60)"/>
+        <circle cx="220" cy="185" r="14" fill="rgba(255,180,120,0.60)"/>
+        <circle cx="160" cy="170" r="10" fill="rgba(120,180,255,0.55)"/>
+        <rect x="154" y="175" width="12" height="6" rx="3" fill="rgba(120,180,255,0.55)"/>
+      `),
+      pet: svgWrap(`
+        ${sky}${ground}
+        <rect x="110" y="70" width="120" height="120" rx="24" fill="rgba(120,180,255,0.18)"/>
+        <rect x="120" y="80" width="100" height="100" rx="18" fill="rgba(120,180,255,0.22)"/>
+        <circle cx="165" cy="130" r="16" fill="rgba(255,180,120,0.70)"/>
+        <path d="M180 130 C194 122 202 128 202 138 C196 138 188 136 180 130 Z" fill="rgba(255,180,120,0.70)"/>
+        <circle cx="155" cy="126" r="3" fill="rgba(0,0,0,0.45)"/>
+        <circle cx="170" cy="126" r="3" fill="rgba(0,0,0,0.45)"/>
+        <path d="M160 138 C166 146 174 146 180 138" stroke="rgba(255,255,255,0.35)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      `),
+      kite: svgWrap(`
+        ${sky}${ground}
+        <path d="M260 40 C240 30 220 34 210 52 C240 54 250 60 260 76 C272 62 275 50 260 40 Z" fill="rgba(255,255,255,0.20)"/>
+        <polygon points="140,40 180,80 140,120 100,80" fill="rgba(255,138,161,0.40)"/>
+        <line x1="140" y1="120" x2="120" y2="190" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
+        <circle cx="110" cy="190" r="14" fill="rgba(255,180,120,0.65)"/>
+      `),
+      garden: svgWrap(`
+        ${sky}${ground}
+        <rect x="70" y="150" width="180" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
+        <circle cx="110" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
+        <circle cx="160" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
+        <circle cx="210" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
+        <rect x="154" y="96" width="12" height="42" rx="6" fill="rgba(255,255,255,0.18)"/>
+        <path d="M150 110 C138 100 132 112 142 120" fill="rgba(120,255,176,0.35)"/>
+        <path d="M170 110 C182 100 188 112 178 120" fill="rgba(120,255,176,0.35)"/>
+      `),
+      neighbors: svgWrap(`
+        ${sky}${ground}
+        <rect x="120" y="110" width="80" height="70" rx="12" fill="rgba(255,255,255,0.16)"/>
+        <rect x="110" y="92" width="100" height="26" rx="10" fill="rgba(255,255,255,0.12)"/>
+        <circle cx="95" cy="178" r="14" fill="rgba(255,180,120,0.65)"/>
+        <circle cx="225" cy="178" r="14" fill="rgba(255,180,120,0.65)"/>
+        <line x1="109" y1="172" x2="121" y2="162" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="211" y1="172" x2="199" y2="162" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linecap="round"/>
+      `),
+      library: svgWrap(`
+        ${sky}${ground}
+        <rect x="60" y="70" width="200" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
+        <rect x="80" y="90" width="160" height="16" rx="8" fill="rgba(120,180,255,0.20)"/>
+        <rect x="80" y="114" width="160" height="16" rx="8" fill="rgba(255,138,161,0.16)"/>
+        <rect x="80" y="138" width="160" height="16" rx="8" fill="rgba(120,255,176,0.16)"/>
+        <rect x="120" y="162" width="80" height="22" rx="10" fill="rgba(255,255,255,0.16)"/>
+      `),
+      storm: svgWrap(`
+        ${sky}${ground}
+        <circle cx="90" cy="55" r="24" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="120" cy="52" r="22" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="150" cy="58" r="26" fill="rgba(255,255,255,0.20)"/>
+        <polygon points="140,76 120,118 142,118 128,156 170,110 146,110 160,76" fill="rgba(255,255,255,0.22)"/>
+        ${ground}
+        <circle cx="240" cy="165" r="18" fill="rgba(255,180,120,0.65)"/>
+        <rect x="232" y="182" width="16" height="18" rx="8" fill="rgba(255,255,255,0.16)"/>
+      `),
+      bridge: svgWrap(`
+        ${sky}${ground}
+        <rect x="40" y="158" width="240" height="10" rx="5" fill="rgba(255,255,255,0.18)"/>
+        <path d="M60 158 C90 120 120 120 150 158" stroke="rgba(120,180,255,0.45)" stroke-width="6" fill="none"/>
+        <path d="M170 158 C200 120 230 120 260 158" stroke="rgba(120,180,255,0.45)" stroke-width="6" fill="none"/>
+        <circle cx="110" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
+        <circle cx="130" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
+        <circle cx="150" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
+      `),
+      weather: svgWrap(`
+        ${sky}${ground}
+        <circle cx="70" cy="55" r="18" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="92" cy="50" r="16" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="112" cy="58" r="18" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="220" cy="60" r="20" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="244" cy="54" r="18" fill="rgba(255,255,255,0.20)"/>
+        <circle cx="262" cy="62" r="20" fill="rgba(255,255,255,0.20)"/>
+        <rect x="70" y="145" width="180" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
+        <rect x="92" y="155" width="60" height="8" rx="4" fill="rgba(120,180,255,0.40)"/>
+        <rect x="92" y="168" width="90" height="8" rx="4" fill="rgba(120,255,176,0.25)"/>
+      `),
+      robot: svgWrap(`
+        ${sky}${ground}
+        <rect x="120" y="70" width="80" height="90" rx="16" fill="rgba(255,255,255,0.16)"/>
+        <rect x="138" y="56" width="44" height="22" rx="10" fill="rgba(255,255,255,0.12)"/>
+        <circle cx="148" cy="108" r="6" fill="rgba(120,180,255,0.55)"/>
+        <circle cx="172" cy="108" r="6" fill="rgba(120,180,255,0.55)"/>
+        <rect x="140" y="126" width="40" height="8" rx="4" fill="rgba(255,138,161,0.25)"/>
+        <rect x="108" y="160" width="104" height="10" rx="5" fill="rgba(255,255,255,0.14)"/>
+      `),
+      recycle: svgWrap(`
+        ${sky}${ground}
+        <rect x="70" y="90" width="70" height="100" rx="14" fill="rgba(120,255,176,0.12)"/>
+        <rect x="180" y="90" width="70" height="100" rx="14" fill="rgba(120,180,255,0.12)"/>
+        <path d="M105 120 L115 110 L125 120" stroke="rgba(120,255,176,0.45)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M215 120 L225 110 L235 120" stroke="rgba(120,180,255,0.45)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="130" cy="175" r="10" fill="rgba(255,180,120,0.65)"/>
+        <circle cx="190" cy="175" r="10" fill="rgba(255,180,120,0.65)"/>
+      `),
+      system: svgWrap(`
+        ${sky}${ground}
+        <rect x="70" y="70" width="180" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
+        <rect x="92" y="92" width="136" height="18" rx="9" fill="rgba(120,180,255,0.20)"/>
+        <rect x="92" y="118" width="136" height="18" rx="9" fill="rgba(255,138,161,0.16)"/>
+        <rect x="92" y="144" width="136" height="18" rx="9" fill="rgba(120,255,176,0.16)"/>
+        <circle cx="260" cy="175" r="14" fill="rgba(255,180,120,0.65)"/>
+      `),
+      plants: svgWrap(`
+        ${sky}${ground}
+        <rect x="70" y="150" width="60" height="40" rx="12" fill="rgba(255,255,255,0.10)"/>
+        <rect x="190" y="150" width="60" height="40" rx="12" fill="rgba(255,255,255,0.10)"/>
+        <rect x="96" y="120" width="8" height="30" rx="4" fill="rgba(255,255,255,0.18)"/>
+        <path d="M100 132 C86 122 82 136 92 144" fill="rgba(120,255,176,0.35)"/>
+        <path d="M108 132 C122 122 126 136 116 144" fill="rgba(120,255,176,0.35)"/>
+        <rect x="216" y="105" width="8" height="45" rx="4" fill="rgba(255,255,255,0.18)"/>
+        <path d="M220 118 C204 108 198 124 210 134" fill="rgba(120,255,176,0.35)"/>
+        <path d="M228 118 C244 108 250 124 238 134" fill="rgba(120,255,176,0.35)"/>
+        <circle cx="250" cy="55" r="18" fill="rgba(255,255,255,0.18)"/>
+        <circle cx="250" cy="55" r="10" fill="rgba(255,255,255,0.24)"/>
+      `),
+      city: svgWrap(`
+        ${sky}${ground}
+        <rect x="50" y="140" width="220" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
+        <rect x="90" y="110" width="140" height="40" rx="14" fill="rgba(120,180,255,0.18)"/>
+        <circle cx="110" cy="150" r="10" fill="rgba(255,255,255,0.16)"/>
+        <circle cx="210" cy="150" r="10" fill="rgba(255,255,255,0.16)"/>
+        <rect x="250" y="92" width="26" height="90" rx="10" fill="rgba(255,255,255,0.10)"/>
+        <circle cx="263" cy="115" r="6" fill="rgba(255,138,161,0.20)"/>
+        <circle cx="263" cy="135" r="6" fill="rgba(120,255,176,0.20)"/>
+      `),
+      lab: svgWrap(`
+        ${sky}${ground}
+        <rect x="70" y="70" width="180" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
+        <rect x="92" y="92" width="60" height="70" rx="14" fill="rgba(120,180,255,0.16)"/>
+        <rect x="160" y="92" width="68" height="70" rx="14" fill="rgba(255,138,161,0.12)"/>
+        <path d="M104 110 L140 110" stroke="rgba(255,255,255,0.20)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M172 120 L216 120" stroke="rgba(255,255,255,0.20)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="250" cy="175" r="14" fill="rgba(255,180,120,0.65)"/>
+      `)
+    };
+
+    return themes[theme] || svgWrap(`${sky}${ground}<circle cx="160" cy="110" r="44" fill="rgba(255,255,255,0.10)"/>`);
+  }
+
+  // ===================== ITEM GENERATORS =====================
+  function makeWordsItem(grade, letter) {
+    const pool = WORD_BANK[grade][letter] || WORD_BANK[grade]["A"];
+    const count = grade <= 2 ? 8 : 10;
+    const picked = [];
+    for (let i=0; i<count; i++) picked.push(pool[randInt(0, pool.length-1)]);
+    return {
+      kind:"words",
+      title:"Word Fluency",
+      text: picked.join("   "),
+      theme: "library",
+      question: null
+    };
+  }
+
+  function makeSentenceItem(grade) {
+    const templ = SENTENCE_TEMPLATES[grade][randInt(0, SENTENCE_TEMPLATES[grade].length-1)];
+    const correct = templ.blanks[randInt(0, templ.blanks.length-1)];
+    const distract = [];
+    const all = templ.blanks.slice();
+    while (distract.length < 3) {
+      const w = all[randInt(0, all.length-1)];
+      if (w !== correct && !distract.includes(w)) distract.push(w);
+    }
+    const choices = [correct, ...distract].sort(() => Math.random() - 0.5);
+
+    return {
+      kind:"sentence",
+      title:"Sentence Meaning",
+      text: templ.t.replace("___", "_____"),
+      theme: "neighbors",
+      question: { question:"Choose the best word to fill the blank.", choices, answerIndex: choices.indexOf(correct) }
+    };
+  }
+
+  function makePassageItem(grade) {
+    const p = PASSAGES[grade][randInt(0, PASSAGES[grade].length-1)];
+    return {
+      kind:"passage",
+      title: p.title,
+      text: p.text,
+      theme: p.theme,
+      question: { question: p.q.question, choices: p.q.choices.slice(), answerIndex: p.q.answerIndex }
+    };
+  }
+
+  function makePhonicsItem(grade, letter) {
+    const block = PHONICS[grade][letter] || PHONICS[grade]["A"];
+    const set = block.sets[randInt(0, block.sets.length-1)];
+    const kind = "phonics";
+
+    // Normalize to MCQ format
+    if (block.type === "cvc_blend") {
+      const letters = set.letters || [];
+      const prompt = set.prompt || "Blend the sounds. Tap the word.";
+      const text = letters.join(" - ");
+      const answerIndex = set.choices.indexOf(set.correct);
+      return { kind, title:"Phonics Blend", text, theme:"kite", question:{ question: prompt, choices:set.choices.slice(), answerIndex } };
+    }
+
+    if (block.type === "grapheme_sound") {
+      const text = `Pattern: ${set.pattern}`;
+      const answerIndex = set.choices.indexOf(set.correct);
+      return { kind, title:"Phonics Pattern", text, theme:"rain", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+    }
+
+    if (block.type === "blend_cluster") {
+      const text = `Blend: ${set.blend}`;
+      const answerIndex = set.choices.indexOf(set.correct);
+      return { kind, title:"Phonics Blends", text, theme:"storm", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+    }
+
+    // morphology
+    const text = "Word Parts";
+    const answerIndex = set.choices.indexOf(set.correct);
+    return { kind, title:"Word Parts", text, theme:"lab", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+  }
+
+  function generateItem(step) {
+    const grade = Number(el.grade.value);
+    const letter = step.letter;
+
+    if (step.mode === "phonics") return makePhonicsItem(grade, letter);
+    if (step.mode === "words") return makeWordsItem(grade, letter);
+    if (step.mode === "sentence") return makeSentenceItem(grade);
+    return makePassageItem(grade);
+  }
+
+  // ===================== RENDERING =====================
+  function clearChoices() {
+    el.choices.innerHTML = "";
+    el.qaWrap.style.display = "none";
+  }
+
+  function lockChoices() {
+    Array.from(el.choices.querySelectorAll("button")).forEach(b => b.disabled = true);
+  }
+
+  function renderItem(item) {
+    state.current = item;
+
+    el.modeBadge.textContent =
+      item.kind === "phonics" ? "PHONICS" :
+      item.kind === "words" ? "WORDS" :
+      item.kind === "sentence" ? "SENTENCE" : "PASSAGE";
+
+    el.itemKindPill.textContent = `Item: ${item.title}`;
+    el.readingText.textContent = item.text;
+    el.illustrationBox.innerHTML = illustrationForTheme(item.theme);
+
+    clearChoices();
+
+    if (item.question) {
+      el.qaWrap.style.display = "block";
+      el.questionText.textContent = item.question.question;
+
+      item.question.choices.forEach((c, idx) => {
+        const b = document.createElement("button");
+        b.className = "choiceBtn";
+        b.textContent = c;
+        b.addEventListener("click", () => pickChoice(idx));
+        el.choices.appendChild(b);
+      });
+
+      setFeedback("Tap an answer.", "");
+    } else {
+      setFeedback("Read out loud. Then tap Mark Correct or Mark Incorrect.", "");
+    }
+  }
+
+  function pickChoice(idx) {
+    const item = state.current;
+    if (!item || !item.question) return;
+
+    lockChoices();
+    const correctIdx = item.question.answerIndex;
+    const isCorrect = idx === correctIdx;
+
+    Array.from(el.choices.children).forEach((btn, i) => {
+      if (i === correctIdx) btn.classList.add("correct");
+      if (i === idx && !isCorrect) btn.classList.add("wrong");
+    });
+
+    finalizeItem(isCorrect, true);
+  }
+
+  // ===================== WORKSHEET FLOW =====================
+  function startWorksheet() {
+    state.started = true;
+    state.setTarget = clamp(Number(el.targetCount.value || 10), 5, 50);
+    state.setDone = 0;
+    state.correct = 0;
+    state.total = 0;
+    state.perItemTimes = [];
+    state.itemStartTs = null;
+    state.passedThisWorksheet = false;
+
+    stopTimer();
+    nextItem(true);
+    updateStepDescription();
+    updateStats();
+  }
+
+  function nextItem(isNew=false) {
+    if (!state.started) return;
+
+    if (!isNew && state.setDone >= state.setTarget) {
+      checkMastery(true);
+      finishWorksheetAndLog();
+      maybeAutoAdvance();
+      updateStats();
+
+      el.modeBadge.textContent = "DONE";
+      el.itemKindPill.textContent = "Item: -";
+      el.readingText.textContent = "Worksheet done!";
+      el.illustrationBox.innerHTML = illustrationForTheme("system");
+      clearChoices();
+      setFeedback("Nice work. Start a new worksheet when ready.", "okText");
+      return;
+    }
+
+    const step = getSelectedStepObj();
+    const item = generateItem(step);
+    renderItem(item);
+    state.itemStartTs = performance.now();
+
+    updateStepDescription();
+    updateStats();
+  }
+
+  function finalizeItem(isCorrect, fromChoice=false) {
+    if (!state.current) return;
+
+    const dt = state.itemStartTs ? (performance.now() - state.itemStartTs) / 1000 : 0;
+    state.total += 1;
+    state.perItemTimes.push(dt);
+    state.setDone += 1;
+
+    if (isCorrect) {
+      state.correct += 1;
+      setFeedback(`Correct. (${dt.toFixed(1)}s)`, "okText");
+    } else {
+      setFeedback(`Not quite. (${dt.toFixed(1)}s)`, "badText");
+    }
+
+    updateStats();
+    stopTimer();
+
+    setTimeout(() => nextItem(false), fromChoice ? 560 : 420);
+  }
+
+  function markCorrect() { finalizeItem(true, false); }
+  function markWrong() { finalizeItem(false, false); }
+  function skipItem() { finalizeItem(false, false); }
+
+  function checkMastery(showMessage) {
+    const step = getSelectedStepObj();
+    const acc = state.total ? (state.correct / state.total) : 1;
+    const avg = computeAvgTime();
+    const enoughAttempts = state.total >= Math.min(state.setTarget, 6);
+    const passed = enoughAttempts && acc >= step.mastery.acc && avg > 0 && avg <= step.mastery.time;
+
+    if (showMessage) {
+      if (passed) setFeedback("Mastery PASS.", "okText");
+      else setFeedback(`To pass: ≥${Math.round(step.mastery.acc*100)}% and ≤${step.mastery.time}s avg time.`, "");
+    }
+    return { passed, acc, avg };
+  }
+
+  function maybeAutoAdvance() {
+    if (!state.autoAdvance) return;
+    const g = Number(el.grade.value);
+    const idx = Number(el.step.value);
+    const steps = STEPS[g];
+    const mastery = checkMastery(false);
+
+    if (mastery.passed && !state.passedThisWorksheet) {
+      state.passedThisWorksheet = true;
+      if (idx < steps.length - 1) {
+        setFeedback("Mastery PASS. Moving to next step.", "okText");
+        el.step.value = String(idx + 1);
+        updateStepDescription();
+      } else {
+        setFeedback("Mastery PASS. Finished this grade’s steps.", "okText");
+      }
+    }
+  }
+
+  function finishWorksheetAndLog() {
+    const step = getSelectedStepObj();
+    const mastery = checkMastery(false);
+    const accPct = state.total ? Math.round((state.correct / state.total) * 100) : 100;
+
+    addHistoryEntry({
+      date: todayISO(),
+      ts: Date.now(),
+      grade: Number(el.grade.value),
+      stepId: step.id,
+      stepName: step.name,
+      letter: step.letter,
+      mode: step.mode,
+      items: state.setTarget,
+      attempts: state.total,
+      correct: state.correct,
+      accuracyPct: accPct,
+      avgTime: Number(computeAvgTime().toFixed(1)),
+      masteryPassed: mastery.passed
+    });
+
+    renderHistory();
+  }
+
+  // ===================== TIMER (FLUENCY) =====================
+  function fmtMMSS(sec) {
+    const m = Math.floor(sec/60);
+    const s = String(sec%60).padStart(2,"0");
+    return `${m}:${s}`;
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.timerRunning = true;
+    state.timerStart = Date.now();
+    el.timerPill.textContent = "Timer: 1:00";
+
+    state.timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - state.timerStart)/1000);
+      const left = Math.max(0, 60 - elapsed);
+      el.timerPill.textContent = `Timer: ${fmtMMSS(left)}`;
+      if (left <= 0) {
+        stopTimer();
+        setFeedback("Timer done. Mark correct or incorrect.", "");
+      }
+      updateStats();
+    }, 200);
+
+    updateStats();
+  }
+
+  function stopTimer() {
+    if (state.timerInterval) clearInterval(state.timerInterval);
+    state.timerInterval = null;
+    state.timerRunning = false;
+    el.timerPill.textContent = "Timer: 0:00";
+    updateStats();
+  }
+
+  // ===================== PRINT =====================
+  function escapeHTML(s) {
+    return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  }
+
+  function buildPrintItems(count) {
+    const step = getSelectedStepObj();
+    const items = [];
+    for (let i=0;i<count;i++) items.push(generateItem(step));
+    return items;
+  }
+
+  function renderPrintSheet() {
+    const step = getSelectedStepObj();
+    const g = Number(el.grade.value);
+    const count = clamp(Number(el.targetCount.value || 10), 5, 50);
+    const items = buildPrintItems(count);
+    const dateStr = todayISO();
+
+    const blocks = items.map((it, idx) => {
+      const header = `<div class="pMode">${idx+1}. ${escapeHTML(it.kind.toUpperCase())} | ${escapeHTML(it.title)}</div>`;
+      const text = `<div class="pText">${escapeHTML(it.text)}</div>`;
+
+      if (!it.question) {
+        return `<div class="pBlock">${header}${text}<div class="pQ">Check: <span class="pBlank"></span></div></div>`;
+      }
+
+      const q = `<div class="pQ">Q: ${escapeHTML(it.question.question)} <span class="pBlank"></span></div>`;
+      const note = `<div class="pNote">Choices on screen. Student answers orally or writes here.</div>`;
+      return `<div class="pBlock">${header}${text}${q}${note}</div>`;
+    }).join("");
+
+    el.printArea.innerHTML = `
+      <div class="pSheet">
+        <div class="pHeader">
+          <div class="pTitle">Reading + Phonics Worksheet</div>
+          <div class="pMeta">Date: ${dateStr}<br/>Grade ${g} | ${escapeHTML(step.id)} (${escapeHTML(step.letter)})</div>
+        </div>
+        <div class="pLine"></div>
+        <div class="pInfo">
+          <div>Name: __________________________</div>
+          <div>Time: _____________   Score: ______ / ${count}</div>
+        </div>
+        ${blocks}
+        <div class="pFooter">
+          <div>Step: ${escapeHTML(step.name)}</div>
+          <div>Accuracy first, then speed.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function printWorksheet() {
+    renderPrintSheet();
+    setTimeout(() => window.print(), 60);
+  }
+
+  // ===================== HISTORY =====================
+  function renderHistory() {
+    const hist = loadHistory();
+    const today = todayISO();
+    const view = (state.historyFilter === "today") ? hist.filter(h => h.date === today) : hist;
+
+    if (!view.length) {
+      el.historyList.innerHTML = `<div class="smallNote">No history yet. Finish a worksheet to log it.</div>`;
+      return;
+    }
+
+    el.historyList.innerHTML = view.slice(0, 25).map(h => {
+      const pass = !!h.masteryPassed;
+      const tagClass = pass ? "pass" : "fail";
+      const tagText = pass ? "PASS" : "TRY AGAIN";
+      const when = new Date(h.ts || Date.now());
+      const hh = String(when.getHours()).padStart(2,"0");
+      const mm = String(when.getMinutes()).padStart(2,"0");
+      return `
+        <div class="histItem">
+          <div class="histLeft">
+            <span class="tag ${tagClass}">${tagText}</span>
+            <span class="tag">G${h.grade}</span>
+            <span class="tag">${h.stepId}</span>
+            <span class="tag">${String(h.mode).toUpperCase()}</span>
+            <span style="opacity:.9;">${h.stepName}</span>
+          </div>
+          <div style="opacity:.92; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <span class="tag">${h.date} ${hh}:${mm}</span>
+            <span class="tag">Acc ${h.accuracyPct}%</span>
+            <span class="tag">Avg ${h.avgTime}s</span>
+            <span class="tag">${h.items} items</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // ===================== EVENTS =====================
+  el.startBtn.addEventListener("click", startWorksheet);
+  el.nextBtn.addEventListener("click", () => nextItem(false));
+  el.markCorrectBtn.addEventListener("click", markCorrect);
+  el.markWrongBtn.addEventListener("click", markWrong);
+  el.skipBtn.addEventListener("click", skipItem);
+
+  el.resetStatsBtn.addEventListener("click", () => {
+    state.correct = 0;
+    state.total = 0;
+    state.perItemTimes = [];
+    state.passedThisWorksheet = false;
+    setFeedback("Stats reset.", "");
+    updateStats();
+  });
+
+  el.toggleAutoAdvanceBtn.addEventListener("click", () => {
+    state.autoAdvance = !state.autoAdvance;
+    el.toggleAutoAdvanceBtn.textContent = `Auto-Advance: ${state.autoAdvance ? "ON" : "OFF"}`;
+  });
+
+  el.grade.addEventListener("change", () => {
+    updateStepDropdown();
+    state.passedThisWorksheet = false;
+    updateStats();
+    renderHistory();
+    if (state.started) startWorksheet();
+  });
+
+  el.step.addEventListener("change", () => {
+    updateStepDescription();
+    state.passedThisWorksheet = false;
+    updateStats();
+    if (state.started) startWorksheet();
+  });
+
+  el.printBtn.addEventListener("click", printWorksheet);
+  el.startTimerBtn.addEventListener("click", startTimer);
+  el.stopTimerBtn.addEventListener("click", stopTimer);
+
+  el.todayOnlyBtn.addEventListener("click", () => { state.historyFilter = "today"; renderHistory(); });
+  el.allHistoryBtn.addEventListener("click", () => { state.historyFilter = "all"; renderHistory(); });
+  el.clearHistoryBtn.addEventListener("click", () => { localStorage.removeItem(HISTORY_KEY); renderHistory(); });
+
+  // Session clock
+  setInterval(() => {
+    const s = Math.floor((Date.now() - state.sessionStartTs)/1000);
+    const mm = Math.floor(s/60);
+    const ss = String(s%60).padStart(2,"0");
+    el.sessionClock.textContent = `Session: ${mm}:${ss}`;
+  }, 500);
+
+  // ===================== INIT =====================
+  updateStepDropdown();
+  updateStepDescription();
+  updateStats();
+  renderHistory();
+  el.illustrationBox.innerHTML = illustrationForTheme("library");
+})();
+</script>
+</body>
+</html>
