@@ -1,0 +1,1638 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Kids Fun Work • Interactive iPad Tracing</title>
+  <style>
+    :root{
+      --bg:#f2f4f8;
+      --paper:#ffffff;
+      --ink:#1b1f2a;
+      --muted:#5a6478;
+      --line:#d7deea;
+      --box:#f5f8ff;
+      --ui:#ffffff;
+      --uiBorder:#d9e0ef;
+      --shadow: 0 10px 30px rgba(18,25,38,0.08);
+      --btn:#ffffff;
+      --btnBorder:#cfd6e6;
+      --btnActive:#eef3ff;
+      --pill:#f2f5fb;
+      --pillBorder:#d9e0ef;
+
+      --blue:#7fb6ff;
+      --yellow:#ffe38a;
+      --green:#a6e6b0;
+      --pink:#ffb6d5;
+      --purple:#c7b7ff;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      touch-action: manipulation;
+      overscroll-behavior: none;
+    }
+    .app{ min-height:100%; display:flex; flex-direction:column; }
+
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background: rgba(242,244,248,0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(217,224,239,0.7);
+      padding:12px 12px 10px;
+    }
+    .row{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+    }
+    .title{ display:flex; flex-direction:column; gap:2px; }
+    .title .h{ font-weight:900; font-size:16px; letter-spacing:0.2px; }
+    .title .s{ font-size:12px; color:#4d5668; max-width:680px; }
+
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    button, .seg button{
+      appearance:none;
+      border:1px solid var(--btnBorder);
+      background:var(--btn);
+      padding:12px 12px;
+      border-radius:14px;
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 1px 0 rgba(0,0,0,0.04);
+      min-width:44px; min-height:44px;
+      touch-action: manipulation;
+      user-select:none;
+    }
+    button:active{ background:var(--btnActive); transform: translateY(1px); }
+
+    .seg{
+      display:flex;
+      border:1px solid var(--pillBorder);
+      background:var(--pill);
+      border-radius:16px;
+      padding:4px;
+      gap:4px;
+    }
+    .seg button{
+      border:none; box-shadow:none; background:transparent;
+      padding:10px 12px; border-radius:12px; font-weight:950; color:#3f485a;
+    }
+    .seg button[aria-pressed="true"]{
+      background:#fff;
+      border:1px solid var(--uiBorder);
+      color:#1b1f2a;
+    }
+
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border:1px solid var(--uiBorder);
+      background:#fff;
+      border-radius:14px;
+      min-height:44px;
+      font-weight:950;
+      color:#1b1f2a;
+      user-select:none;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background:var(--green);
+      box-shadow:0 0 0 3px rgba(166,230,176,0.25);
+      flex:0 0 auto;
+    }
+    .dot.warn{
+      background:var(--yellow);
+      box-shadow:0 0 0 3px rgba(255,227,138,0.25);
+    }
+
+    .content{ padding:12px; display:flex; justify-content:center; }
+    .card{
+      background:var(--ui);
+      border:1px solid var(--uiBorder);
+      border-radius:18px;
+      padding:10px;
+      box-shadow: var(--shadow);
+      max-width:min(980px, 100%);
+      width:100%;
+    }
+    .stage{
+      position:relative;
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      overflow:hidden;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid #e8edf7;
+    }
+    canvas{
+      display:block;
+      width:100%;
+      height:auto;
+      background:#fff;
+      border-radius:14px;
+      touch-action:none;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      background:rgba(27,31,42,0.92);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:950;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 220ms ease;
+      max-width:92vw;
+      text-align:center;
+      z-index:50;
+    }
+    .toast.show{ opacity:1; }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(27,31,42,0.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:40;
+    }
+    .overlay.show{ display:flex; }
+    .modal{
+      width:min(520px, 96vw);
+      background:#fff;
+      border-radius:20px;
+      border:1px solid #e1e7f4;
+      box-shadow:0 18px 45px rgba(18,25,38,0.18);
+      padding:16px;
+    }
+    .modal h2{
+      margin:0 0 8px 0;
+      font-size:18px;
+      font-weight:1000;
+      letter-spacing:0.2px;
+    }
+    .modal p{
+      margin:0 0 12px 0;
+      color:#3f485a;
+      font-weight:700;
+      line-height:1.35;
+      font-size:14px;
+    }
+    .modal .actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .primary{
+      border-color:#b8c7e8;
+      background:#eef3ff;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .toast{ transition:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="row">
+        <div class="title">
+          <div class="h">Kids Fun Work • Interactive Tracing</div>
+          <div class="s">Choose a mode: Letters or Lines+Shapes. Complete all challenges, then tap “Next Worksheet” for a new set.</div>
+        </div>
+
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Mode selection">
+            <button id="modeLetters" aria-pressed="true">Letters</button>
+            <button id="modeShapes" aria-pressed="false">Lines+Shapes</button>
+          </div>
+
+          <div class="pill" id="progressPill" title="Progress">
+            <span class="dot warn" id="progressDot"></span>
+            <span id="progressText">Challenge 1 of 6</span>
+          </div>
+
+          <div class="seg" role="group" aria-label="Tool selection">
+            <button id="toolDraw" aria-pressed="true">Draw</button>
+            <button id="toolErase" aria-pressed="false">Erase</button>
+            <button id="toolPan" aria-pressed="false">Pan</button>
+          </div>
+
+          <button id="btnCheck">Check</button>
+          <button id="btnNext">Next Worksheet</button>
+
+          <button id="btnUndo">Undo</button>
+          <button id="btnClearInk">Clear Ink</button>
+          <button id="btnResetView">Reset View</button>
+          <button id="btnDownload">Download</button>
+          <button id="btnPrint">Print</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="stage">
+          <canvas id="sheet"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <div id="overlay" class="overlay" role="dialog" aria-modal="true">
+      <div class="modal">
+        <h2 id="modalTitle">Worksheet complete!</h2>
+        <p id="modalBody">Ready for a new tracing challenge?</p>
+        <div class="actions">
+          <button id="modalClose">Keep Practicing</button>
+          <button id="modalNext" class="primary">Next Worksheet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* Interactive Worksheet System (iPad friendly)
+   - Two modes: Letters and Lines+Shapes
+   - New worksheet generates a fresh challenge set for the selected mode
+   - Touch drawing + erasing + panning + pinch zoom
+   - Completion check based on ink coverage inside each target zone
+*/
+
+const toastEl = document.getElementById("toast");
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>toastEl.classList.remove("show"), 1400);
+}
+
+const overlay = document.getElementById("overlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalBody = document.getElementById("modalBody");
+const modalClose = document.getElementById("modalClose");
+const modalNext = document.getElementById("modalNext");
+
+modalClose.addEventListener("click", ()=> overlay.classList.remove("show"));
+modalNext.addEventListener("click", ()=>{ overlay.classList.remove("show"); newWorksheet(); });
+
+const ui = {
+  modeLetters: document.getElementById("modeLetters"),
+  modeShapes: document.getElementById("modeShapes"),
+
+  progressText: document.getElementById("progressText"),
+  progressDot: document.getElementById("progressDot"),
+
+  toolDraw: document.getElementById("toolDraw"),
+  toolErase: document.getElementById("toolErase"),
+  toolPan: document.getElementById("toolPan"),
+
+  btnCheck: document.getElementById("btnCheck"),
+  btnNext: document.getElementById("btnNext"),
+  btnUndo: document.getElementById("btnUndo"),
+  btnClearInk: document.getElementById("btnClearInk"),
+  btnResetView: document.getElementById("btnResetView"),
+  btnDownload: document.getElementById("btnDownload"),
+  btnPrint: document.getElementById("btnPrint"),
+};
+
+const displayCanvas = document.getElementById("sheet");
+const dctx = displayCanvas.getContext("2d", { alpha: false });
+
+const pageCanvas = document.createElement("canvas");
+const pctx = pageCanvas.getContext("2d", { alpha: false });
+
+const inkCanvas = document.createElement("canvas");
+const ictx = inkCanvas.getContext("2d");
+
+const TARGET_W = 2000;
+const TARGET_H = 2500;
+pageCanvas.width = TARGET_W;
+pageCanvas.height = TARGET_H;
+inkCanvas.width = TARGET_W;
+inkCanvas.height = TARGET_H;
+
+let tool = "draw";
+let isDown = false;
+let last = {x:0,y:0};
+let panStart = {x:0,y:0};
+let view = { scale: 1, tx: 0, ty: 0 };
+
+let undoStack = [];
+const UNDO_LIMIT = 18;
+
+let mode = "letters"; // "letters" | "shapes"
+let zones = [];
+let worksheetSeed = 1;
+
+function randInt(a,b){ return Math.floor(a + Math.random()*(b-a+1)); }
+function pick(arr){ return arr[randInt(0, arr.length-1)]; }
+function sample(arr, n){
+  const copy = arr.slice();
+  const out = [];
+  for (let i=0;i<n;i++){
+    const idx = randInt(0, copy.length-1);
+    out.push(copy.splice(idx,1)[0]);
+  }
+  return out;
+}
+
+function pushUndoSnapshot(){
+  try{
+    const img = ictx.getImageData(0,0,inkCanvas.width, inkCanvas.height);
+    undoStack.push(img);
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  }catch(e){}
+}
+function undo(){
+  if (!undoStack.length){ toast("Nothing to undo"); return; }
+  const prev = undoStack.pop();
+  ictx.putImageData(prev, 0, 0);
+  renderDisplay();
+  toast("Undo");
+}
+function clearInk(){
+  ictx.setTransform(1,0,0,1,0,0);
+  ictx.clearRect(0,0,inkCanvas.width, inkCanvas.height);
+  undoStack = [];
+  renderDisplay();
+  toast("Ink cleared");
+}
+
+function setTool(next){
+  tool = next;
+  ui.toolDraw.setAttribute("aria-pressed", tool === "draw");
+  ui.toolErase.setAttribute("aria-pressed", tool === "erase");
+  ui.toolPan.setAttribute("aria-pressed", tool === "pan");
+  toast(tool === "draw" ? "Draw" : tool === "erase" ? "Erase" : "Pan");
+}
+ui.toolDraw.addEventListener("click", ()=>setTool("draw"));
+ui.toolErase.addEventListener("click", ()=>setTool("erase"));
+ui.toolPan.addEventListener("click", ()=>setTool("pan"));
+
+ui.btnUndo.addEventListener("click", undo);
+ui.btnClearInk.addEventListener("click", clearInk);
+ui.btnResetView.addEventListener("click", ()=>{
+  view = { scale: 1, tx: 0, ty: 0 };
+  renderDisplay();
+  toast("View reset");
+});
+
+ui.modeLetters.addEventListener("click", ()=>{
+  if (mode === "letters") return;
+  mode = "letters";
+  ui.modeLetters.setAttribute("aria-pressed", "true");
+  ui.modeShapes.setAttribute("aria-pressed", "false");
+  newWorksheet(true);
+});
+ui.modeShapes.addEventListener("click", ()=>{
+  if (mode === "shapes") return;
+  mode = "shapes";
+  ui.modeShapes.setAttribute("aria-pressed", "true");
+  ui.modeLetters.setAttribute("aria-pressed", "false");
+  newWorksheet(true);
+});
+
+function setProgress(){
+  const doneCount = zones.filter(z=>z.done).length;
+  const total = zones.length || 1;
+  const active = Math.min(doneCount + 1, total);
+  ui.progressText.textContent = `Challenge ${active} of ${total}`;
+  ui.progressDot.classList.toggle("warn", doneCount < total);
+}
+
+function showCompleteModal(){
+  modalTitle.textContent = "Worksheet complete!";
+  modalBody.textContent = "You finished all challenges. Want a new worksheet with new tracing tasks?";
+  overlay.classList.add("show");
+}
+
+ui.btnCheck.addEventListener("click", ()=>{
+  const res = checkZones();
+  toast(res.message);
+  if (res.allDone) showCompleteModal();
+});
+
+ui.btnNext.addEventListener("click", ()=>newWorksheet());
+
+function newWorksheet(isModeSwitch=false){
+  worksheetSeed++;
+  clearInk();
+  view = { scale: 1, tx: 0, ty: 0 };
+  const data = (mode === "letters") ? generateLettersData() : generateShapesData();
+  renderWorksheetToPageCanvas(data);
+  renderDisplay();
+  setProgress();
+  toast(isModeSwitch ? "Mode changed" : "New worksheet");
+}
+
+// ==========================
+// Worksheet Data Generators
+// ==========================
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const WORD_BANK = [
+  {w:"cat", i:"cat"}, {w:"dog", i:"dog"}, {w:"sun", i:"sun"}, {w:"hat", i:"hat"},
+  {w:"fish", i:"fish"}, {w:"bird", i:"bird"}, {w:"frog", i:"frog"}, {w:"tree", i:"tree"},
+  {w:"moon", i:"moon"}, {w:"star", i:"star"}, {w:"car", i:"car"}, {w:"bus", i:"bus"},
+  {w:"ball", i:"ball"}, {w:"kite", i:"kite"}, {w:"duck", i:"duck"}, {w:"bear", i:"bear"},
+];
+
+function generateLettersData(){
+  const uppercaseSet = sample(LETTERS, 5);
+  const lowercaseSet = uppercaseSet.map(ch => ch.toLowerCase());
+  const pairsSet = sample(uppercaseSet, 4).map(ch => `${ch} ${ch.toLowerCase()}`);
+  const wordsSet = sample(WORD_BANK, 4);
+  const theme = pick(["Stars", "Clouds", "Animals", "Fruits"]);
+  return { kind:"letters", uppercaseSet, lowercaseSet, pairsSet, wordsSet, theme };
+}
+
+const SHAPE_TYPES = ["line", "zigzag", "curve", "circle", "wave", "square", "triangle", "rectangle", "oval", "spiral"];
+function generateShapesData(){
+  const warmTypes = sample(SHAPE_TYPES, 5);
+
+  // Mid section: bigger trace shapes (6)
+  const midShapes = sample(SHAPE_TYPES, 6);
+
+  // Maze-ish path: choose a path pattern
+  const pathType = pick(["loop", "s", "mountain", "stairs", "rainbow"]);
+
+  // Copy patterns: choose 4 patterns of strokes
+  const patterns = sample(["|||", "ooo", "vvvv", "ssss", "----", "////"], 4);
+
+  const theme = pick(["Stars", "Clouds", "Animals", "Fruits"]);
+  return { kind:"shapes", warmTypes, midShapes, pathType, patterns, theme };
+}
+
+// ==========================
+// Drawing Helpers
+// ==========================
+function setFont(ctx, size, weight = 700, family = `"Trebuchet MS", "Comic Sans MS", system-ui, -apple-system, "Segoe UI", Arial, sans-serif`) {
+  ctx.font = `${weight} ${size}px ${family}`;
+}
+function roundRectPath(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+function fillRoundRect(ctx, x,y,w,h,r, fillStyle) {
+  ctx.save();
+  ctx.fillStyle = fillStyle;
+  roundRectPath(ctx,x,y,w,h,r);
+  ctx.fill();
+  ctx.restore();
+}
+function strokeRoundRect(ctx, x,y,w,h,r, strokeStyle, lineWidth = 3, dash=null) {
+  ctx.save();
+  ctx.strokeStyle = strokeStyle;
+  ctx.lineWidth = lineWidth;
+  if (dash) ctx.setLineDash(dash);
+  roundRectPath(ctx,x,y,w,h,r);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawDivider(ctx, x, y, w) {
+  ctx.save();
+  ctx.strokeStyle = "#d7deea";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 10]);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawBadge(ctx, x, y, text, bg, fg="#1b1f2a") {
+  ctx.save();
+  setFont(ctx, 30, 800);
+  const padX = 16, padY = 10;
+  const tw = ctx.measureText(text).width;
+  const w = tw + padX*2;
+  const h = 44 + padY;
+  fillRoundRect(ctx, x, y, w, h, 16, bg);
+  ctx.fillStyle = fg;
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, x + padX, y + h/2);
+  ctx.restore();
+}
+function drawIconPencil(ctx, x, y, s) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.2);
+  fillRoundRect(ctx, -s*0.38, -s*0.08, s*0.76, s*0.16, s*0.08, "#7fb6ff");
+  fillRoundRect(ctx, -s*0.46, -s*0.09, s*0.12, s*0.18, s*0.06, "#ffb6d5");
+  fillRoundRect(ctx, -s*0.34, -s*0.09, s*0.06, s*0.18, s*0.04, "#cfd6e6");
+  ctx.beginPath();
+  ctx.moveTo(s*0.38, -s*0.08);
+  ctx.lineTo(s*0.5, 0);
+  ctx.lineTo(s*0.38, s*0.08);
+  ctx.closePath();
+  ctx.fillStyle = "#ffe38a";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(s*0.46, -s*0.02);
+  ctx.lineTo(s*0.5, 0);
+  ctx.lineTo(s*0.46, s*0.02);
+  ctx.closePath();
+  ctx.fillStyle = "#1b1f2a";
+  ctx.fill();
+  ctx.restore();
+}
+function drawCloud(ctx, x, y, w, h, color="#f5f8ff") {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.ellipse(x + w*0.25, y + h*0.55, w*0.18, h*0.22, 0, 0, Math.PI*2);
+  ctx.ellipse(x + w*0.42, y + h*0.45, w*0.22, h*0.28, 0, 0, Math.PI*2);
+  ctx.ellipse(x + w*0.60, y + h*0.55, w*0.18, h*0.22, 0, 0, Math.PI*2);
+  ctx.ellipse(x + w*0.48, y + h*0.62, w*0.32, h*0.20, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+function drawStar(ctx, x, y, r, fill="#ffe38a", stroke="#caa84a") {
+  ctx.save();
+  ctx.beginPath();
+  const spikes = 5;
+  const outer = r;
+  const inner = r * 0.45;
+  let rot = Math.PI / 2 * 3;
+  const step = Math.PI / spikes;
+  ctx.moveTo(x, y - outer);
+  for (let i = 0; i < spikes; i++) {
+    ctx.lineTo(x + Math.cos(rot) * outer, y + Math.sin(rot) * outer);
+    rot += step;
+    ctx.lineTo(x + Math.cos(rot) * inner, y + Math.sin(rot) * inner);
+    rot += step;
+  }
+  ctx.lineTo(x, y - outer);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+}
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+  let yy = y;
+  for (let n=0;n<words.length;n++){
+    const testLine = line + words[n] + " ";
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      ctx.fillText(line.trim(), x, yy);
+      line = words[n] + " ";
+      yy += lineHeight;
+    } else line = testLine;
+  }
+  ctx.fillText(line.trim(), x, yy);
+}
+function drawInstruction(ctx, x, y, text, maxW) {
+  ctx.save();
+  setFont(ctx, 30, 700, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  ctx.fillStyle = "#3f485a";
+  ctx.textBaseline = "top";
+  wrapText(ctx, text, x, y, maxW, 40);
+  ctx.restore();
+}
+function drawArrow(ctx, x1,y1,x2,y2, color="#7fb6ff") {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const headLen = 18;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/7), y2 - headLen * Math.sin(angle - Math.PI/7));
+  ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/7), y2 - headLen * Math.sin(angle + Math.PI/7));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+function sectionHeader(ctx, x, y, title, tagText, tagColor) {
+  ctx.save();
+  setFont(ctx, 44, 950);
+  ctx.fillStyle = "#1b1f2a";
+  ctx.textBaseline = "top";
+  ctx.fillText(title, x, y);
+  if (tagText){
+    const w = ctx.measureText(title).width;
+    drawBadge(ctx, x + w + 16, y + 6, tagText, tagColor);
+  }
+  ctx.restore();
+}
+function drawTheme(ctx, theme){
+  if (theme === "Clouds"){
+    drawCloud(ctx, 110, 70, 520, 200, "#f5f8ff");
+    drawCloud(ctx, TARGET_W - 690, 90, 580, 210, "#f5f8ff");
+  } else if (theme === "Stars"){
+    for (let i=0;i<7;i++){
+      const x = 160 + i*240;
+      const y = 120 + (i%2)*50;
+      drawStar(ctx, x, y, 18, "#ffffff", "#d7deea");
+    }
+  } else if (theme === "Fruits"){
+    ctx.save();
+    ctx.fillStyle = "rgba(255,182,213,0.20)";
+    for (let i=0;i<10;i++){
+      const x = 140 + i*180;
+      const y = 110 + (i%3)*30;
+      ctx.beginPath();
+      ctx.arc(x, y, 16, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  } else if (theme === "Animals"){
+    ctx.save();
+    ctx.fillStyle = "rgba(166,230,176,0.18)";
+    for (let i=0;i<8;i++){
+      const x = 140 + i*220;
+      const y = 110 + (i%2)*26;
+      ctx.beginPath();
+      ctx.arc(x, y, 16, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x-10, y-18, 7, 0, Math.PI*2);
+      ctx.arc(x+10, y-18, 7, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+// Shapes library
+function drawTraceShape(ctx, type, x, y, w, h){
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#6b7891";
+  ctx.lineWidth = 10;
+  ctx.setLineDash([8, 14]);
+
+  const pad = Math.min(w,h)*0.16;
+  const x0 = x + pad, y0 = y + pad, x1 = x + w - pad, y1 = y + h - pad;
+  const cx = (x0 + x1)/2, cy = (y0 + y1)/2;
+
+  ctx.beginPath();
+  if (type === "line"){
+    ctx.moveTo(x0, cy); ctx.lineTo(x1, cy);
+  } else if (type === "zigzag"){
+    const steps = 6;
+    const dx = (x1-x0)/steps;
+    for (let i=0;i<=steps;i++){
+      const xx = x0 + dx*i;
+      const yy = (i%2===0) ? y1 : y0;
+      if (i===0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+    }
+  } else if (type === "curve"){
+    ctx.moveTo(x0, y1);
+    ctx.quadraticCurveTo(cx, y0, x1, y1);
+  } else if (type === "circle"){
+    ctx.arc(cx, cy, Math.min(w,h)*0.28, 0, Math.PI*2);
+  } else if (type === "wave"){
+    const seg = 4;
+    const dx = (x1-x0)/seg;
+    ctx.moveTo(x0, cy);
+    for (let i=0;i<seg;i++){
+      const sx = x0 + dx*i;
+      ctx.bezierCurveTo(sx + dx*0.25, cy - h*0.18, sx + dx*0.50, cy + h*0.18, sx + dx, cy);
+    }
+  } else if (type === "square"){
+    ctx.rect(cx - (x1-x0)*0.22, cy - (y1-y0)*0.22, (x1-x0)*0.44, (y1-y0)*0.44);
+  } else if (type === "rectangle"){
+    ctx.rect(cx - (x1-x0)*0.28, cy - (y1-y0)*0.18, (x1-x0)*0.56, (y1-y0)*0.36);
+  } else if (type === "triangle"){
+    ctx.moveTo(cx, y0);
+    ctx.lineTo(x1, y1);
+    ctx.lineTo(x0, y1);
+    ctx.closePath();
+  } else if (type === "oval"){
+    ctx.ellipse(cx, cy, (x1-x0)*0.26, (y1-y0)*0.18, 0, 0, Math.PI*2);
+  } else if (type === "spiral"){
+    const turns = 3.2;
+    const pts = 140;
+    const maxR = Math.min(w,h)*0.32;
+    for (let i=0;i<pts;i++){
+      const t = i/(pts-1);
+      const ang = t * turns * Math.PI*2;
+      const r = t * maxR;
+      const px = cx + Math.cos(ang) * r;
+      const py = cy + Math.sin(ang) * r;
+      if (i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+  } else {
+    ctx.moveTo(x0, cy); ctx.lineTo(x1, cy);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Arrow hint (simple)
+  const ax1 = x + w*0.25, ay1 = y + h*0.18;
+  const ax2 = x + w*0.75, ay2 = y + h*0.18;
+  drawArrow(ctx, ax1, ay1, ax2, ay2, "rgba(127,182,255,0.9)");
+}
+
+function drawDottedTraceText(ctx, text, x, y, sizePx, dot=6) {
+  ctx.save();
+  setFont(ctx, sizePx, 900, `"Trebuchet MS","Comic Sans MS",system-ui,Arial,sans-serif`);
+  ctx.textBaseline = "alphabetic";
+  ctx.lineWidth = Math.max(4, Math.floor(sizePx * 0.09));
+  ctx.strokeStyle = "#6b7891";
+  ctx.setLineDash([dot, dot*2]);
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.strokeText(text, x, y);
+  ctx.setLineDash([]);
+  ctx.fillStyle = "rgba(127,182,255,0.10)";
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+function drawWritingLines(ctx, x, y, w, lines, lineGap) {
+  ctx.save();
+  ctx.strokeStyle = "#d7deea";
+  ctx.lineWidth = 3;
+  for (let i=0;i<lines;i++){
+    const yy = y + i*lineGap;
+    ctx.beginPath();
+    ctx.moveTo(x, yy);
+    ctx.lineTo(x + w, yy);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawRewardBox(ctx, x, y, w, h){
+  fillRoundRect(ctx, x, y, w, h, 26, "#ffffff");
+  strokeRoundRect(ctx, x, y, w, h, 26, "#d7deea", 3);
+  ctx.save();
+  setFont(ctx, 34, 950);
+  ctx.fillStyle = "#1b1f2a";
+  ctx.textBaseline = "top";
+  ctx.fillText("My Reward Stars", x + 18, y + 18);
+  ctx.restore();
+
+  ctx.save();
+  setFont(ctx, 26, 700, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  ctx.fillStyle = "#3f485a";
+  ctx.textBaseline = "top";
+  ctx.fillText("Fill stars as you finish!", x + 18, y + 62);
+  ctx.restore();
+
+  const starRowY = y + 110;
+  const starCount = 5;
+  const gap = (w - 36) / starCount;
+  for (let i=0;i<starCount;i++){
+    drawStar(ctx, x + 18 + gap*i + gap/2, starRowY + 26, 22, "#ffffff", "#cfd6e6");
+  }
+}
+function drawTipBox(ctx, x, y, w, h, text){
+  fillRoundRect(ctx, x, y, w, h, 26, "#ffffff");
+  strokeRoundRect(ctx, x, y, w, h, 26, "#d7deea", 3);
+  ctx.save();
+  setFont(ctx, 34, 950);
+  ctx.fillStyle = "#1b1f2a";
+  ctx.textBaseline = "top";
+  ctx.fillText("Grown-up Tip", x + 22, y + 18);
+  ctx.restore();
+
+  ctx.save();
+  setFont(ctx, 28, 700, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  ctx.fillStyle = "#3f485a";
+  ctx.textBaseline = "top";
+  wrapText(ctx, text, x + 22, y + 64, w - 44, 38);
+  ctx.restore();
+}
+
+// Zones
+function resetZones(){ zones = []; }
+function addZone(id, label, rect, threshold){
+  zones.push({ id, label, rect, threshold, done:false });
+}
+function drawZoneOutline(ctx){
+  ctx.save();
+  ctx.strokeStyle = "rgba(127,182,255,0.38)";
+  ctx.lineWidth = 5;
+  ctx.setLineDash([10, 12]);
+  for (const z of zones){
+    roundRectPath(ctx, z.rect.x, z.rect.y, z.rect.w, z.rect.h, 20);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ==========================
+// Render Worksheets (Both Modes)
+// ==========================
+function renderHeader(themeLabel){
+  const W = pageCanvas.width, H = pageCanvas.height;
+  const pad = 120;
+  const innerX = pad;
+  const innerY = pad;
+  const innerW = W - pad*2;
+
+  strokeRoundRect(pctx, pad, pad, innerW, H - pad*2, 48, "#cfd6e6", 6);
+
+  const titleY = innerY + 28;
+  drawIconPencil(pctx, innerX + 40, titleY + 42, 120);
+
+  pctx.save();
+  setFont(pctx, 92, 950);
+  pctx.fillStyle = "#1b1f2a";
+  pctx.textBaseline = "top";
+  pctx.fillText("Kids Fun Work", innerX + 120, titleY);
+  pctx.restore();
+
+  pctx.save();
+  setFont(pctx, 38, 800, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  pctx.fillStyle = "#3f485a";
+  pctx.textBaseline = "top";
+  pctx.fillText(themeLabel, innerX + 122, titleY + 104);
+  pctx.restore();
+
+  drawBadge(pctx, innerX + innerW - 650, titleY + 14, `Worksheet #${worksheetSeed}`, "#c7b7ff");
+  drawBadge(pctx, innerX + innerW - 420, titleY + 14, "Age 4–9", "#a6e6b0");
+  drawBadge(pctx, innerX + innerW - 250, titleY + 14, mode === "letters" ? "Letters" : "Lines+Shapes", "#ffe38a");
+
+  drawDivider(pctx, innerX + 30, titleY + 170, innerW - 60);
+  return { pad, innerX, innerY, innerW, titleY };
+}
+
+function renderWorksheetToPageCanvas(data){
+  resetZones();
+
+  const W = pageCanvas.width, H = pageCanvas.height;
+  pctx.setTransform(1,0,0,1,0,0);
+  pctx.clearRect(0,0,W,H);
+  pctx.fillStyle = "#ffffff";
+  pctx.fillRect(0,0,W,H);
+
+  drawTheme(pctx, data.theme);
+
+  const pad = 120;
+  const innerX = pad;
+  const innerW = W - pad*2;
+
+  const header = renderHeader(data.kind === "letters" ? "Trace letters and words" : "Trace lines and shapes");
+  let cursorY = header.titleY + 205;
+
+  if (data.kind === "letters"){
+    renderLettersBody(innerX, innerW, cursorY, data);
+  } else {
+    renderShapesBody(innerX, innerW, cursorY, data);
+  }
+
+  // Footer
+  pctx.save();
+  setFont(pctx, 46, 950);
+  pctx.fillStyle = "#1b1f2a";
+  pctx.textBaseline = "bottom";
+  pctx.fillText("You’re Amazing!", innerX + 54, H - pad - 30);
+  pctx.restore();
+
+  pctx.save();
+  setFont(pctx, 22, 700, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  pctx.fillStyle = "#6b7891";
+  pctx.textBaseline = "bottom";
+  pctx.fillText("Name: ______________________    Date: ________________", innerX + innerW - 760, H - pad - 34);
+  pctx.restore();
+
+  drawZoneOutline(pctx);
+  zones.forEach(z=>z.done=false);
+  setProgress();
+}
+
+function renderLettersBody(innerX, innerW, cursorY, data){
+  const colGap = 34;
+  const colW = (innerW - colGap) / 2;
+  const leftX = innerX;
+  const rightX = innerX + colW + colGap;
+
+  // Section 1 warm-up mini boxes
+  const s1H = 420;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s1H, 34, "#f5f8ff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s1H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "1) Warm-Up Lines & Shapes", "Warm up!", "#ffb6d5");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace the lines and shapes. Stay inside each box.", innerW - 108);
+
+  const boxY = cursorY + 160;
+  const miniW = (innerW - 48 - 54*2 - 30*4) / 5;
+  const miniH = 210;
+  const startX = innerX + 54;
+  const warmTypes = sample(["line","zigzag","curve","circle","wave","square","triangle","oval"], 5);
+  for (let i=0;i<5;i++){
+    const x = startX + i*(miniW + 30);
+    fillRoundRect(pctx, x, boxY, miniW, miniH, 18, "#ffffff");
+    strokeRoundRect(pctx, x, boxY, miniW, miniH, 18, "#d7deea", 3);
+    drawTraceShape(pctx, warmTypes[i], x, boxY, miniW, miniH);
+    addZone(`warm${i+1}`, `Warm-up box ${i+1}`, {x, y:boxY, w:miniW, h:miniH}, 0.012);
+  }
+  cursorY += s1H + 28;
+
+  // Sections 2 & 3 letters
+  const s23H = 520;
+
+  // Uppercase
+  fillRoundRect(pctx, leftX + 24, cursorY, colW - 48, s23H, 34, "#ffffff");
+  strokeRoundRect(pctx, leftX + 24, cursorY, colW - 48, s23H, 34, "#d7deea", 3);
+  sectionHeader(pctx, leftX + 48, cursorY + 24, "2) Uppercase Tracing", "BIG", "#7fb6ff");
+  drawInstruction(pctx, leftX + 48, cursorY + 88, "Trace the big letters. Try to stay neat.", colW - 96);
+
+  let ly = cursorY + 170;
+  for (let i=0;i<data.uppercaseSet.length;i++){
+    const rowY = ly + i*64;
+    drawDottedTraceText(pctx, data.uppercaseSet[i], leftX + 70, rowY + 56, 72, 6);
+    drawArrow(pctx, leftX + 150, rowY + 18, leftX + 220, rowY + 18, "#7fb6ff");
+    drawWritingLines(pctx, leftX + 250, rowY + 62, colW - 340, 1, 1);
+    addZone(`U${i}`, `Uppercase ${data.uppercaseSet[i]}`, {x:leftX + 54, y:rowY + 10, w:colW - 108, h:72}, 0.010);
+  }
+
+  // Lowercase
+  fillRoundRect(pctx, rightX + 24, cursorY, colW - 48, s23H, 34, "#ffffff");
+  strokeRoundRect(pctx, rightX + 24, cursorY, colW - 48, s23H, 34, "#d7deea", 3);
+  sectionHeader(pctx, rightX + 48, cursorY + 24, "3) Lowercase Tracing", "small", "#a6e6b0");
+  drawInstruction(pctx, rightX + 48, cursorY + 88, "Trace the small letters slowly.", colW - 96);
+
+  ly = cursorY + 170;
+  for (let i=0;i<data.lowercaseSet.length;i++){
+    const rowY = ly + i*64;
+    drawDottedTraceText(pctx, data.lowercaseSet[i], rightX + 72, rowY + 56, 68, 6);
+    drawArrow(pctx, rightX + 150, rowY + 18, rightX + 220, rowY + 18, "#a6e6b0");
+    drawWritingLines(pctx, rightX + 250, rowY + 62, colW - 340, 1, 1);
+    addZone(`L${i}`, `Lowercase ${data.lowercaseSet[i]}`, {x:rightX + 54, y:rowY + 10, w:colW - 108, h:72}, 0.010);
+  }
+
+  cursorY += s23H + 28;
+
+  // Section 4 pairs
+  const s4H = 420;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s4H, 34, "#ffffff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s4H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "4) Trace and Write", "Try it!", "#ffe38a");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace the pair, then write it on the line.", innerW - 108);
+
+  const rowStartY = cursorY + 160;
+  const rowGap = 62;
+  for (let i=0;i<data.pairsSet.length;i++){
+    const y = rowStartY + i*rowGap;
+    drawDottedTraceText(pctx, data.pairsSet[i], innerX + 80, y + 48, 64, 6);
+    drawArrow(pctx, innerX + 240, y + 16, innerX + 320, y + 16, i%2? "#a6e6b0":"#7fb6ff");
+    drawWritingLines(pctx, innerX + 360, y + 58, innerW - 520, 1, 1);
+    drawStar(pctx, innerX + 340, y + 58, 18, "#ffe38a", "#caa84a");
+    addZone(`P${i}`, `Pair ${data.pairsSet[i]}`, {x:innerX + 54, y:y + 8, w:innerW - 108, h:74}, 0.010);
+  }
+
+  cursorY += s4H + 28;
+
+  // Section 5 words + reward/tip
+  const s5H = 560;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s5H, 34, "#f5f8ff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s5H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "5) Fun Word Tracing", "Words", "#7fb6ff");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace each word, then write it again on the line.", innerW - 108);
+
+  const wordBoxX = innerX + 54;
+  const wordBoxY = cursorY + 150;
+  const wordBoxW = innerW - 108;
+  const wordRowH = 88;
+
+  for (let i=0;i<data.wordsSet.length;i++){
+    const y = wordBoxY + i*wordRowH;
+    fillRoundRect(pctx, wordBoxX, y, wordBoxW, wordRowH - 14, 26, "#ffffff");
+    strokeRoundRect(pctx, wordBoxX, y, wordBoxW, wordRowH - 14, 26, "#d7deea", 3);
+
+    const word = data.wordsSet[i].w;
+    drawDottedTraceText(pctx, word, wordBoxX + 36, y + 58, 64, 6);
+    const lineX = wordBoxX + 330;
+    drawWritingLines(pctx, lineX, y + 58, wordBoxW - 430, 1, 1);
+
+    addZone(`W${i}`, `Word ${word}`, {x:wordBoxX + 14, y:y + 6, w:wordBoxW - 28, h:70}, 0.012);
+  }
+
+  const rewardX = innerX + innerW - 54 - (innerW * 0.30);
+  const rewardY = wordBoxY + data.wordsSet.length*wordRowH + 10;
+  const rewardW = innerW * 0.30;
+  const rewardH = 175;
+
+  drawRewardBox(pctx, rewardX, rewardY, rewardW, rewardH);
+  drawTipBox(pctx, innerX + 54, rewardY, innerW * 0.62, rewardH, "Say the letter and sound. Praise effort. Short breaks help tired hands.");
+}
+
+function renderShapesBody(innerX, innerW, cursorY, data){
+  // Section 1 warm-up (repeat lines and shapes)
+  const s1H = 420;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s1H, 34, "#f5f8ff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s1H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "1) Warm-Up Boxes", "Easy", "#ffb6d5");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace each shape inside the box. Stay in the box.", innerW - 108);
+
+  const boxY = cursorY + 160;
+  const miniW = (innerW - 48 - 54*2 - 30*4) / 5;
+  const miniH = 210;
+  const startX = innerX + 54;
+  for (let i=0;i<5;i++){
+    const x = startX + i*(miniW + 30);
+    fillRoundRect(pctx, x, boxY, miniW, miniH, 18, "#ffffff");
+    strokeRoundRect(pctx, x, boxY, miniW, miniH, 18, "#d7deea", 3);
+    drawTraceShape(pctx, data.warmTypes[i], x, boxY, miniW, miniH);
+    addZone(`warmS${i}`, `Warm-up ${data.warmTypes[i]}`, {x, y:boxY, w:miniW, h:miniH}, 0.012);
+  }
+
+  cursorY += s1H + 28;
+
+  // Section 2 bigger shapes (grid 2x3)
+  const s2H = 560;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s2H, 34, "#ffffff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s2H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "2) Big Shape Tracing", "Bigger", "#7fb6ff");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace each big shape. Try to keep it smooth and neat.", innerW - 108);
+
+  const gridX = innerX + 54;
+  const gridY = cursorY + 150;
+  const gridW = innerW - 108;
+  const cols = 3;
+  const rows = 2;
+  const gap = 22;
+  const cellW = (gridW - gap*(cols-1)) / cols;
+  const cellH = 180;
+
+  let idx = 0;
+  for (let r=0;r<rows;r++){
+    for (let c=0;c<cols;c++){
+      const x = gridX + c*(cellW + gap);
+      const y = gridY + r*(cellH + gap);
+      fillRoundRect(pctx, x, y, cellW, cellH, 22, "#f5f8ff");
+      strokeRoundRect(pctx, x, y, cellW, cellH, 22, "#d7deea", 3);
+      const t = data.midShapes[idx];
+      drawTraceShape(pctx, t, x, y, cellW, cellH);
+
+      // label
+      pctx.save();
+      setFont(pctx, 28, 900, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+      pctx.fillStyle = "#3f485a";
+      pctx.textBaseline = "top";
+      pctx.fillText(t, x + 16, y + 10);
+      pctx.restore();
+
+      addZone(`big${idx}`, `Big ${t}`, {x, y, w:cellW, h:cellH}, 0.012);
+      idx++;
+    }
+  }
+
+  cursorY += s2H + 28;
+
+  // Section 3 path tracing
+  const s3H = 420;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s3H, 34, "#f5f8ff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s3H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "3) Trace the Path", "Path", "#a6e6b0");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Follow the dotted path from START to FINISH.", innerW - 108);
+
+  const pathX = innerX + 54;
+  const pathY = cursorY + 150;
+  const pathW = innerW - 108;
+  const pathH = 230;
+
+  // path box
+  fillRoundRect(pctx, pathX, pathY, pathW, pathH, 26, "#ffffff");
+  strokeRoundRect(pctx, pathX, pathY, pathW, pathH, 26, "#d7deea", 3);
+
+  // draw path
+  pctx.save();
+  pctx.strokeStyle = "#6b7891";
+  pctx.lineWidth = 12;
+  pctx.lineCap = "round";
+  pctx.lineJoin = "round";
+  pctx.setLineDash([10, 16]);
+  const x0 = pathX + 40, x1 = pathX + pathW - 40;
+  const y0 = pathY + pathH/2;
+  pctx.beginPath();
+
+  if (data.pathType === "loop"){
+    pctx.moveTo(x0, y0);
+    pctx.bezierCurveTo(pathX + pathW*0.25, pathY + 40, pathX + pathW*0.55, pathY + pathH - 40, x1, y0);
+  } else if (data.pathType === "s"){
+    pctx.moveTo(x0, pathY + 60);
+    pctx.bezierCurveTo(pathX + pathW*0.25, pathY + 10, pathX + pathW*0.45, pathY + pathH - 10, pathX + pathW*0.60, pathY + pathH - 60);
+    pctx.bezierCurveTo(pathX + pathW*0.70, pathY + pathH - 110, pathX + pathW*0.85, pathY + 110, x1, pathY + 60);
+  } else if (data.pathType === "mountain"){
+    pctx.moveTo(x0, pathY + pathH - 60);
+    const peaks = 5;
+    const dx = (x1-x0)/peaks;
+    for (let i=1;i<=peaks;i++){
+      const xx = x0 + dx*i;
+      const yy = (i%2===0) ? (pathY + pathH - 60) : (pathY + 60);
+      pctx.lineTo(xx, yy);
+    }
+  } else if (data.pathType === "stairs"){
+    pctx.moveTo(x0, pathY + pathH - 60);
+    const steps = 6;
+    const dx = (x1-x0)/steps;
+    const dy = (pathH-120)/steps;
+    let cx = x0, cy = pathY + pathH - 60;
+    for (let i=0;i<steps;i++){
+      pctx.lineTo(cx + dx, cy);
+      cx += dx;
+      pctx.lineTo(cx, cy - dy);
+      cy -= dy;
+    }
+  } else { // rainbow
+    pctx.moveTo(x0, pathY + pathH - 60);
+    pctx.quadraticCurveTo(pathX + pathW/2, pathY + 40, x1, pathY + pathH - 60);
+  }
+
+  pctx.stroke();
+  pctx.restore();
+
+  // start/finish labels
+  pctx.save();
+  setFont(pctx, 30, 1000, `system-ui, -apple-system, "Segoe UI", Arial, sans-serif`);
+  pctx.fillStyle = "#1b1f2a";
+  pctx.textBaseline = "top";
+  pctx.fillText("START", pathX + 22, pathY + 12);
+  pctx.fillText("FINISH", pathX + pathW - 120, pathY + 12);
+  pctx.restore();
+
+  addZone("path", "Path", {x:pathX, y:pathY, w:pathW, h:pathH}, 0.010);
+
+  cursorY += s3H + 28;
+
+  // Section 4 patterns
+  const s4H = 420;
+  fillRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s4H, 34, "#ffffff");
+  strokeRoundRect(pctx, innerX + 24, cursorY, innerW - 48, s4H, 34, "#d7deea", 3);
+  sectionHeader(pctx, innerX + 54, cursorY + 24, "4) Copy the Pattern", "Repeat", "#ffe38a");
+  drawInstruction(pctx, innerX + 54, cursorY + 88, "Trace the first row, then copy the same pattern on the blank row.", innerW - 108);
+
+  const patX = innerX + 54;
+  const patY = cursorY + 150;
+  const patW = innerW - 108;
+  const rowH = 64;
+
+  for (let i=0;i<data.patterns.length;i++){
+    const y = patY + i*(rowH + 18);
+    // row box
+    fillRoundRect(pctx, patX, y, patW, rowH, 22, "#f5f8ff");
+    strokeRoundRect(pctx, patX, y, patW, rowH, 22, "#d7deea", 3);
+
+    // left sample area
+    const sW = patW*0.40;
+    fillRoundRect(pctx, patX + 12, y + 10, sW - 24, rowH - 20, 16, "#ffffff");
+    strokeRoundRect(pctx, patX + 12, y + 10, sW - 24, rowH - 20, 16, "#d7deea", 2);
+
+    // right copy area
+    const cX = patX + sW;
+    fillRoundRect(pctx, cX + 12, y + 10, patW - sW - 24, rowH - 20, 16, "#ffffff");
+    strokeRoundRect(pctx, cX + 12, y + 10, patW - sW - 24, rowH - 20, 16, "#d7deea", 2);
+
+    // draw sample pattern (dotted)
+    pctx.save();
+    pctx.strokeStyle = "#6b7891";
+    pctx.lineWidth = 8;
+    pctx.lineCap = "round";
+    pctx.setLineDash([6, 10]);
+    const sampleType = data.patterns[i];
+
+    const start = {x: patX + 28, y: y + rowH/2};
+    const endX = patX + sW - 28;
+
+    pctx.beginPath();
+    if (sampleType === "|||"){
+      for (let k=0;k<6;k++){
+        const xx = patX + 40 + k*30;
+        pctx.moveTo(xx, y + 18);
+        pctx.lineTo(xx, y + rowH - 18);
+      }
+    } else if (sampleType === "ooo"){
+      for (let k=0;k<5;k++){
+        pctx.moveTo(patX + 60 + k*40 + 18, y + rowH/2);
+        pctx.arc(patX + 60 + k*40, y + rowH/2, 18, 0, Math.PI*2);
+      }
+    } else if (sampleType === "vvvv"){
+      let xx = patX + 40;
+      for (let k=0;k<6;k++){
+        pctx.moveTo(xx, y + 18);
+        pctx.lineTo(xx + 18, y + rowH - 18);
+        pctx.lineTo(xx + 36, y + 18);
+        xx += 46;
+      }
+    } else if (sampleType === "ssss"){
+      pctx.moveTo(start.x, start.y);
+      const seg = 5;
+      const dx = (endX - start.x)/seg;
+      for (let k=0;k<seg;k++){
+        const sx = start.x + dx*k;
+        pctx.bezierCurveTo(sx + dx*0.25, start.y - 18, sx + dx*0.50, start.y + 18, sx + dx, start.y);
+      }
+    } else if (sampleType === "----"){
+      pctx.moveTo(start.x, start.y);
+      pctx.lineTo(endX, start.y);
+    } else { // "////"
+      for (let k=0;k<6;k++){
+        const xx = patX + 40 + k*34;
+        pctx.moveTo(xx, y + rowH - 18);
+        pctx.lineTo(xx + 26, y + 18);
+      }
+    }
+    pctx.stroke();
+    pctx.restore();
+
+    // zones: sample and copy row
+    addZone(`patS${i}`, `Pattern sample ${i+1}`, {x:patX + 12, y:y + 10, w:sW - 24, h:rowH - 20}, 0.010);
+    addZone(`patC${i}`, `Pattern copy ${i+1}`, {x:cX + 12, y:y + 10, w:patW - sW - 24, h:rowH - 20}, 0.010);
+  }
+
+  // reward/tip at bottom
+  const rewardY = patY + data.patterns.length*(rowH + 18) + 18;
+  const rewardX = innerX + innerW - 54 - (innerW * 0.30);
+  const rewardW = innerW * 0.30;
+  const rewardH = 175;
+
+  drawRewardBox(pctx, rewardX, rewardY, rewardW, rewardH);
+  drawTipBox(pctx, innerX + 54, rewardY, innerW * 0.62, rewardH, "Trace slowly. Smooth lines matter more than speed. Take breaks if tired.");
+}
+
+// ==========================
+// Display / Viewport
+// ==========================
+function fitDisplayCanvas(){
+  const stage = displayCanvas.parentElement;
+  const maxW = stage.clientWidth;
+  const cssW = maxW;
+  const cssH = Math.round(cssW * (TARGET_H / TARGET_W));
+  displayCanvas.style.width = cssW + "px";
+  displayCanvas.style.height = cssH + "px";
+
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+  displayCanvas.width = Math.round(cssW * dpr);
+  displayCanvas.height = Math.round(cssH * dpr);
+  dctx.setTransform(1,0,0,1,0,0);
+  dctx.imageSmoothingEnabled = true;
+
+  renderDisplay();
+}
+window.addEventListener("resize", fitDisplayCanvas, { passive:true });
+
+function renderDisplay(){
+  const rect = displayCanvas.getBoundingClientRect();
+  const cssW = rect.width;
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+  const base = cssW / TARGET_W;
+
+  dctx.setTransform(1,0,0,1,0,0);
+  dctx.clearRect(0,0,displayCanvas.width, displayCanvas.height);
+
+  dctx.save();
+  dctx.scale(dpr, dpr);
+  dctx.save();
+  dctx.scale(base, base);
+  dctx.translate(view.tx, view.ty);
+  dctx.scale(view.scale, view.scale);
+
+  dctx.drawImage(pageCanvas, 0, 0);
+  dctx.drawImage(inkCanvas, 0, 0);
+
+  // highlight next remaining zones lightly (few)
+  const remaining = zones.filter(z=>!z.done).slice(0, 3);
+  if (remaining.length){
+    dctx.save();
+    dctx.setLineDash([10, 12]);
+    dctx.lineWidth = 6;
+    dctx.strokeStyle = "rgba(255,227,138,0.55)";
+    for (const z of remaining){
+      roundRectPath(dctx, z.rect.x, z.rect.y, z.rect.w, z.rect.h, 20);
+      dctx.stroke();
+    }
+    dctx.restore();
+  }
+
+  dctx.restore();
+  dctx.restore();
+}
+
+// ==========================
+// Input Handling
+// ==========================
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function canvasToPageCoords(clientX, clientY){
+  const rect = displayCanvas.getBoundingClientRect();
+  const x = (clientX - rect.left) / rect.width;
+  const y = (clientY - rect.top) / rect.height;
+  return { x:(x * TARGET_W - view.tx) / view.scale, y:(y * TARGET_H - view.ty) / view.scale };
+}
+
+function beginStroke(e){
+  isDown = true;
+  displayCanvas.setPointerCapture(e.pointerId);
+
+  if (tool === "pan"){
+    panStart = { x: e.clientX, y: e.clientY };
+    return;
+  }
+
+  pushUndoSnapshot();
+  const pt = canvasToPageCoords(e.clientX, e.clientY);
+  last = pt;
+
+  const isPencil = (e.pointerType === "pen");
+  const pressure = (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : 0.5;
+  const baseW = isPencil ? 8 : 10;
+  const w = (tool === "erase") ? (isPencil ? 28 : 34) : clamp(baseW + pressure*12, 6, 22);
+
+  ictx.save();
+  ictx.lineCap = "round";
+  ictx.lineJoin = "round";
+  ictx.lineWidth = w;
+  ictx.globalCompositeOperation = (tool === "erase") ? "destination-out" : "source-over";
+  ictx.strokeStyle = (tool === "erase") ? "rgba(0,0,0,1)" : "rgba(27,31,42,0.92)";
+  ictx.beginPath();
+  ictx.moveTo(pt.x, pt.y);
+  ictx.lineTo(pt.x + 0.01, pt.y + 0.01);
+  ictx.stroke();
+  ictx.restore();
+
+  renderDisplay();
+}
+
+function moveStroke(e){
+  if (!isDown) return;
+
+  if (tool === "pan"){
+    const dx = e.clientX - panStart.x;
+    const dy = e.clientY - panStart.y;
+    panStart = { x:e.clientX, y:e.clientY };
+
+    const rect = displayCanvas.getBoundingClientRect();
+    const cssW = rect.width;
+    const base = cssW / TARGET_W;
+    view.tx += dx / base;
+    view.ty += dy / base;
+    renderDisplay();
+    return;
+  }
+
+  const pt = canvasToPageCoords(e.clientX, e.clientY);
+  const isPencil = (e.pointerType === "pen");
+  const pressure = (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : 0.5;
+  const baseW = isPencil ? 8 : 10;
+  const w = (tool === "erase") ? (isPencil ? 28 : 34) : clamp(baseW + pressure*12, 6, 22);
+
+  ictx.save();
+  ictx.lineCap = "round";
+  ictx.lineJoin = "round";
+  ictx.lineWidth = w;
+  ictx.globalCompositeOperation = (tool === "erase") ? "destination-out" : "source-over";
+  ictx.strokeStyle = (tool === "erase") ? "rgba(0,0,0,1)" : "rgba(27,31,42,0.92)";
+  ictx.beginPath();
+  ictx.moveTo(last.x, last.y);
+  ictx.lineTo(pt.x, pt.y);
+  ictx.stroke();
+  ictx.restore();
+
+  last = pt;
+  renderDisplay();
+}
+
+function endStroke(e){
+  if (!isDown) return;
+  isDown = false;
+  try{ displayCanvas.releasePointerCapture(e.pointerId); }catch(_){}
+  renderDisplay();
+  scheduleAutoCheck();
+}
+
+displayCanvas.addEventListener("pointerdown", (e)=>{ e.preventDefault(); beginStroke(e); }, { passive:false });
+displayCanvas.addEventListener("pointermove", (e)=>{ e.preventDefault(); moveStroke(e); }, { passive:false });
+displayCanvas.addEventListener("pointerup", (e)=>{ e.preventDefault(); endStroke(e); }, { passive:false });
+displayCanvas.addEventListener("pointercancel", (e)=>{ e.preventDefault(); endStroke(e); }, { passive:false });
+displayCanvas.addEventListener("contextmenu", (e)=>e.preventDefault());
+
+// Desktop wheel zoom
+displayCanvas.addEventListener("wheel", (e)=>{
+  e.preventDefault();
+  const delta = Math.sign(e.deltaY);
+  const zoom = (delta > 0) ? 0.92 : 1.08;
+  const before = canvasToPageCoords(e.clientX, e.clientY);
+  view.scale = clamp(view.scale * zoom, 0.75, 2.5);
+  const after = canvasToPageCoords(e.clientX, e.clientY);
+  view.tx += (after.x - before.x) * view.scale;
+  view.ty += (after.y - before.y) * view.scale;
+  renderDisplay();
+}, { passive:false });
+
+// Touch pinch zoom
+let pinch = { active:false, id1:null, id2:null, p1:null, p2:null, dist:0, baseScale:1 };
+function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+function center(a,b){ return { x:(a.x+b.x)/2, y:(a.y+b.y)/2 }; }
+
+displayCanvas.addEventListener("pointerdown", (e)=>{
+  if (e.pointerType === "touch"){
+    if (!pinch.active && pinch.id1 === null){
+      pinch.id1 = e.pointerId; pinch.p1 = {x:e.clientX, y:e.clientY};
+    } else if (!pinch.active && pinch.id2 === null && pinch.id1 !== e.pointerId){
+      pinch.id2 = e.pointerId; pinch.p2 = {x:e.clientX, y:e.clientY};
+      pinch.active = true;
+      pinch.dist = dist(pinch.p1, pinch.p2);
+      pinch.baseScale = view.scale;
+    }
+  }
+}, { passive:true });
+
+displayCanvas.addEventListener("pointermove", (e)=>{
+  if (!pinch.active) return;
+  if (e.pointerId === pinch.id1) pinch.p1 = {x:e.clientX, y:e.clientY};
+  if (e.pointerId === pinch.id2) pinch.p2 = {x:e.clientX, y:e.clientY};
+  if (!pinch.p1 || !pinch.p2) return;
+
+  const c = center(pinch.p1, pinch.p2);
+  const before = canvasToPageCoords(c.x, c.y);
+
+  const newDist = dist(pinch.p1, pinch.p2);
+  const factor = clamp(newDist / pinch.dist, 0.7, 1.6);
+  view.scale = clamp(pinch.baseScale * factor, 0.75, 2.5);
+
+  const after = canvasToPageCoords(c.x, c.y);
+  view.tx += (after.x - before.x) * view.scale;
+  view.ty += (after.y - before.y) * view.scale;
+
+  renderDisplay();
+}, { passive:true });
+
+displayCanvas.addEventListener("pointerup", (e)=>{
+  if (e.pointerId === pinch.id1) { pinch.id1=null; pinch.p1=null; }
+  if (e.pointerId === pinch.id2) { pinch.id2=null; pinch.p2=null; }
+  if (pinch.id1 === null || pinch.id2 === null) pinch.active = false;
+}, { passive:true });
+
+displayCanvas.addEventListener("pointercancel", (e)=>{
+  if (e.pointerId === pinch.id1) { pinch.id1=null; pinch.p1=null; }
+  if (e.pointerId === pinch.id2) { pinch.id2=null; pinch.p2=null; }
+  pinch.active = false;
+}, { passive:true });
+
+// ==========================
+// Completion Checking
+// ==========================
+function inkCoverageInRect(rect){
+  const {x,y,w,h} = rect;
+  const sx = Math.max(0, Math.floor(x));
+  const sy = Math.max(0, Math.floor(y));
+  const sw = Math.min(inkCanvas.width - sx, Math.floor(w));
+  const sh = Math.min(inkCanvas.height - sy, Math.floor(h));
+  if (sw <= 1 || sh <= 1) return 0;
+
+  const step = 8;
+  let filled = 0;
+  let total = 0;
+
+  let img;
+  try{
+    img = ictx.getImageData(sx, sy, sw, sh).data;
+  }catch(e){
+    return 0;
+  }
+
+  const aThresh = 16;
+  for (let yy=0; yy<sh; yy+=step){
+    for (let xx=0; xx<sw; xx+=step){
+      const idx = (yy*sw + xx) * 4 + 3;
+      if (img[idx] > aThresh) filled++;
+      total++;
+    }
+  }
+  return total ? (filled / total) : 0;
+}
+
+function checkZones(){
+  const remaining = zones.filter(z=>!z.done);
+  if (!remaining.length) return { allDone:true, message:"All done!" };
+
+  let newlyDone = 0;
+  for (const z of remaining){
+    const cov = inkCoverageInRect(z.rect);
+    if (cov >= z.threshold){
+      z.done = true;
+      newlyDone++;
+    }
+  }
+
+  setProgress();
+  renderDisplay();
+
+  const still = zones.filter(z=>!z.done);
+  if (!still.length) return { allDone:true, message:"Worksheet complete!" };
+  if (newlyDone) return { allDone:false, message:`Nice! Completed ${newlyDone} challenge${newlyDone>1?"s":""}.` };
+  return { allDone:false, message:`Keep going: trace in the highlighted boxes.` };
+}
+
+let autoCheckTimer = null;
+function scheduleAutoCheck(){
+  clearTimeout(autoCheckTimer);
+  autoCheckTimer = setTimeout(()=>{
+    const before = zones.filter(z=>z.done).length;
+    const res = checkZones();
+    const after = zones.filter(z=>z.done).length;
+    if (after > before) toast("Nice! Progress saved.");
+    if (res.allDone) showCompleteModal();
+  }, 650);
+}
+
+// ==========================
+// Export / Print
+// ==========================
+function compositeToCanvas(){
+  const out = document.createElement("canvas");
+  out.width = TARGET_W;
+  out.height = TARGET_H;
+  const octx = out.getContext("2d", { alpha:false });
+  octx.drawImage(pageCanvas, 0, 0);
+  octx.drawImage(inkCanvas, 0, 0);
+  return out;
+}
+
+ui.btnDownload.addEventListener("click", ()=>{
+  const out = compositeToCanvas();
+  const a = document.createElement("a");
+  a.download = `kids-fun-work-${mode}-worksheet-${worksheetSeed}.png`;
+  a.href = out.toDataURL("image/png");
+  a.click();
+  toast("Downloaded PNG");
+});
+
+ui.btnPrint.addEventListener("click", ()=>{
+  const out = compositeToCanvas();
+  const dataUrl = out.toDataURL("image/png");
+  const w = window.open("", "_blank");
+  if (!w){ toast("Popup blocked. Allow popups to print."); return; }
+  w.document.open();
+  w.document.write(`
+    <!doctype html>
+    <html><head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Print Worksheet</title>
+      <style>
+        html,body{ margin:0; padding:0; background:#fff; }
+        .page{ display:flex; justify-content:center; align-items:center; padding:12px; }
+        img{ max-width:100%; height:auto; }
+        @media print{
+          .page{ padding:0; }
+          img{ width:100%; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="page"><img src="${dataUrl}" alt="Worksheet" /></div>
+      <script>window.onload=()=>{ setTimeout(()=>window.print(), 50); }<\/script>
+    </body></html>
+  `);
+  w.document.close();
+});
+
+// ==========================
+// Init
+// ==========================
+function init(){
+  setTool("draw");
+  ui.modeLetters.setAttribute("aria-pressed","true");
+  ui.modeShapes.setAttribute("aria-pressed","false");
+  mode = "letters";
+  const data = generateLettersData();
+  renderWorksheetToPageCanvas(data);
+  fitDisplayCanvas();
+  setProgress();
+  toast("Ready");
+}
+init();
+</script>
+</body>
+</html>
