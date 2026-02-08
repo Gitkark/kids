@@ -9,55 +9,39 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="format-detection" content="telephone=no" />
 
-  <title>Reading + Phonics (Grades 1–4)</title>
+  <title>Reading Practice</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background: #0b1020; color: #e9ecf5; -webkit-text-size-adjust: 100%; }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px; }
-
-    button, select, input {
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    header { display:flex; gap:14px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
-    h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
-
-    .panel {
-      margin-top: 12px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .controls {
-      display:grid;
-      grid-template-columns: 1.3fr 1.3fr 1fr 1.2fr;
-      gap: 10px;
-      align-items: end;
-    }
-    @media (max-width: 980px) { .controls { grid-template-columns: 1fr 1fr; } }
-
-    label { display:grid; gap:7px; font-size:13px; color: rgba(233,236,245,0.94); }
-    select, button, input[type="number"], input[type="text"] {
-      background: rgba(0,0,0,0.35);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #0b1020;
       color: #e9ecf5;
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 14px;
-      padding: 12px 14px;
-      outline: none;
-      font-size: 16px; /* prevents iOS auto-zoom */
-      min-height: 48px;
+      -webkit-text-size-adjust: 100%;
+      overflow: hidden; /* single-screen */
     }
-    button { cursor:pointer; font-weight: 850; user-select:none; -webkit-user-select:none; }
-    button.primary { background: rgba(64,140,255,0.42); border-color: rgba(64,140,255,0.80); }
-    button:active { transform: translateY(1px); }
 
-    .rowBtns { display:flex; gap:10px; flex-wrap:wrap; }
-    .smallNote { font-size:12px; opacity:0.84; font-weight:650; margin-top:5px; }
+    button, select, input { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 
-    .stats { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
+    .wrap {
+      height: 100vh;
+      max-width: 980px; /* portrait iPad */
+      margin: 0 auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 { margin: 0; font-size: 18px; letter-spacing: 0.2px; font-weight: 900; }
+
     .pill {
       padding: 9px 12px;
       border-radius: 999px;
@@ -65,134 +49,165 @@
       border: 1px solid rgba(255,255,255,0.12);
       font-size: 14px;
       color: rgba(233,236,245,0.95);
-      font-weight: 780;
+      font-weight: 760;
+      white-space: nowrap;
     }
     .pill.ok { border-color: rgba(120,255,176,0.55); }
-    .pill.fail { border-color: rgba(255,138,161,0.55); }
 
-    .grid2 { display:grid; grid-template-columns: 1.35fr 0.95fr; gap:12px; margin-top:12px; }
-    @media (max-width: 980px) { .grid2 { grid-template-columns: 1fr; } }
-
-    .card {
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.12);
+    .panel {
       background: rgba(255,255,255,0.06);
-      padding: 14px;
-    }
-
-    .stepTitle { font-size: 13px; opacity: 0.92; font-weight: 850; text-align:center; margin-bottom: 8px; }
-
-    .contentBox {
-      width: 100%;
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 18px;
-      background: rgba(0,0,0,0.20);
-      border: 1px solid rgba(255,255,255,0.12);
       padding: 12px;
     }
 
-    .modeRow {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
+    .controls {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 10px;
+      align-items: end;
     }
 
-    .modeBadge {
+    label { display: grid; gap: 7px; font-size: 13px; color: rgba(233,236,245,0.94); font-weight: 800; }
+
+    select, button {
+      background: rgba(0,0,0,0.35);
+      color: #e9ecf5;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 16px; /* iOS: prevents auto-zoom */
+      min-height: 48px;
+    }
+    button {
+      cursor: pointer;
+      font-weight: 900;
+      min-height: 52px;
+      user-select: none;
+      -webkit-user-select: none;
+      letter-spacing: 0.2px;
+    }
+    button.primary { background: rgba(64, 140, 255, 0.42); border-color: rgba(64,140,255,0.80); }
+    button:active { transform: translateY(1px); }
+
+    .rowBtns { display:flex; gap:10px; justify-content:flex-end; align-items:center; }
+    .rowBtns button { min-width: 108px; }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .stats .pill { padding: 8px 10px; font-size: 13px; }
+
+    /* -------- Practice area (big + focused) -------- */
+    .practiceCard {
+      flex: 1;
+      min-height: 0;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      padding: 14px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .content {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .topRow {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
       display:inline-block;
-      padding: 6px 10px;
+      padding: 7px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(255,255,255,0.06);
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 950;
+      letter-spacing: 0.3px;
       opacity: 0.95;
     }
 
-    .visualRow {
-      display:grid;
-      grid-template-columns: 1fr 320px;
-      gap: 12px;
+    .readingBox {
+      width: 100%;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 14px 14px;
+      height: 100%;
+      overflow: hidden; /* no scroll */
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
       align-items: start;
     }
-    @media (max-width: 980px) { .visualRow { grid-template-columns: 1fr; } }
+
+    .titleLine {
+      font-weight: 900;
+      opacity: 0.95;
+      font-size: 14px;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
 
     .bigText {
-      font-weight: 900;
+      font-weight: 950;
       letter-spacing: 0.2px;
-      line-height: 1.28;
-      font-size: 30px;
-      text-align: left;
+      line-height: 1.25;
+      font-size: clamp(22px, 3.2vw, 34px);
       white-space: pre-wrap;
       word-break: break-word;
+      overflow: hidden;
+    }
+    .bigText.small {
+      font-size: clamp(18px, 2.6vw, 28px);
+      line-height: 1.22;
     }
 
-    .illustration {
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05);
-      padding: 10px;
-    }
-    .illustration svg { width: 100%; height: auto; display:block; }
-
-    .qaWrap { margin-top: 12px; display:grid; gap:10px; }
-    .question { font-size: 18px; font-weight: 900; }
+    .qaWrap { display:grid; gap:10px; }
+    .question { font-size: 18px; font-weight: 950; }
     .choices { display:grid; gap:10px; }
     .choiceBtn {
       text-align:left;
       padding: 14px;
       min-height: 56px;
       border-radius: 16px;
-      font-weight: 850;
+      font-weight: 900;
     }
     .choiceBtn.correct { border-color: rgba(120,255,176,0.55); background: rgba(120,255,176,0.12); }
     .choiceBtn.wrong { border-color: rgba(255,138,161,0.55); background: rgba(255,138,161,0.10); }
 
-    .answerRow { margin-top: 10px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:center; }
-    .answerRow button { min-width: 150px; }
+    .actions { display:flex; gap:12px; justify-content:center; flex-wrap: wrap; }
+    .actions button { min-width: 150px; }
 
-    .feedback { min-height: 28px; text-align:center; font-size: 18px; font-weight: 900; margin-top: 10px; }
+    .feedback { min-height: 30px; text-align:center; font-size: 18px; font-weight: 950; }
     .okText { color: #78ffb0; }
     .badText { color: #ff8aa1; }
-    .hint { color: rgba(233,236,245,0.82); font-size: 14px; text-align:center; margin-top: 6px; font-weight: 720; }
-
-    .timerRow { display:flex; gap:10px; flex-wrap: wrap; justify-content:center; margin-top: 10px; }
-    .timerBtn { min-width: 160px; }
-
-    .historyHeader { display:flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap:10px; }
-    .historyTitle { font-size: 15px; font-weight: 900; }
-    .historyList { margin-top: 10px; display:grid; gap:10px; }
-    .histItem {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.18);
-      padding: 11px 11px;
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-weight: 720;
-      font-size: 13px;
-    }
-    .histLeft { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
-    .tag {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      font-size: 12px;
-      font-weight: 900;
-      opacity: 0.95;
-    }
-    .tag.pass { border-color: rgba(120,255,176,0.55); }
-    .tag.fail { border-color: rgba(255,138,161,0.55); }
 
     /* Print */
     #printArea { display:none; }
     @media print {
-      body { background:#fff; color:#000; }
-      .wrap, header, .panel, .grid2, .card { display:none !important; }
+      body { background:#fff; color:#000; overflow: visible; }
+      .wrap, header, .panel, .practiceCard { display:none !important; }
       #printArea { display:block !important; }
       #printArea * { color:#000 !important; }
 
@@ -202,55 +217,53 @@
       .pMeta { font-size: 10.5pt; font-weight: 720; text-align:right; }
       .pLine { border-top: 2px solid #000; margin: 10px 0 12px; }
       .pInfo { display:flex; justify-content: space-between; font-size: 11pt; font-weight: 720; margin-bottom: 10px; }
-      .pBlock { margin-bottom: 10mm; }
-      .pMode { font-size: 12pt; font-weight: 900; margin-bottom: 3mm; }
-      .pText { font-size: 14pt; line-height: 1.4; white-space: pre-wrap; }
-      .pQ { margin-top: 4mm; font-size: 12pt; font-weight: 900; }
+      .pBlock { margin-bottom: 9mm; }
+      .pKind { font-size: 11pt; font-weight: 900; margin-bottom: 2mm; }
+      .pText { font-size: 13pt; line-height: 1.4; white-space: pre-wrap; }
+      .pQ { margin-top: 3mm; font-size: 11.5pt; font-weight: 900; }
+      .pChoice { margin-top: 1.5mm; font-size: 11.5pt; }
       .pBlank { display:inline-block; min-width: 120mm; border-bottom: 2px solid #000; transform: translateY(-2px); }
       .pFooter { margin-top: 10mm; font-size: 10pt; font-weight: 720; display:flex; justify-content: space-between; }
-      .pNote { font-size: 10pt; font-weight: 720; margin-top: 2mm; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>Reading + Phonics (Grades 1–4)</h1>
-      <div class="pill" id="sessionClock">Session: 0:00</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h1>Reading Practice</h1>
+      </div>
+
+      <div class="pill" id="clockNow">Time: --:--</div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <div class="pill" id="sessionClock">Session: 0:00</div>
+      </div>
     </header>
 
     <div class="panel">
       <div class="controls">
         <label>
-          Grade
-          <select id="grade">
-            <option value="1">Grade 1</option>
-            <option value="2" selected>Grade 2</option>
-            <option value="3">Grade 3</option>
-            <option value="4">Grade 4</option>
+          Practice type
+          <select id="mode">
+            <option value="phonics_easy">Phonics – easy</option>
+            <option value="phonics_hard">Phonics – difficult</option>
+            <option value="words_easy">Words – easy</option>
+            <option value="words_hard">Words – difficult</option>
+            <option value="sentence_easy">Sentences – easy</option>
+            <option value="sentence_hard">Sentences – difficult</option>
+            <option value="passage_easy">Passages – easy</option>
+            <option value="passage_hard">Passages – difficult</option>
+            <option value="mix_easy" selected>Mix – easy</option>
+            <option value="mix_hard">Mix – difficult</option>
           </select>
-          <div class="smallNote">Each grade has A/B/C steps and phonics practice.</div>
-        </label>
-
-        <label>
-          Step (A/B/C)
-          <select id="step"></select>
-          <div class="smallNote" id="stepDesc"></div>
-        </label>
-
-        <label>
-          Items per worksheet
-          <input id="targetCount" type="number" min="5" max="50" value="10" />
-          <div class="smallNote">Each item is phonics, words, sentence, or passage.</div>
         </label>
 
         <div style="display:grid; gap:10px;">
-          <button class="primary" id="startBtn">Start / New Worksheet</button>
+          <button class="primary" id="startBtn">Start</button>
           <div class="rowBtns">
-            <button id="printBtn">Print Worksheet</button>
-            <button id="skipBtn">Skip</button>
-            <button id="resetStatsBtn">Reset Stats</button>
-            <button id="toggleAutoAdvanceBtn">Auto-Advance: ON</button>
+            <button id="printBtn">Print</button>
+            <button id="clearHistoryBtn">Clear History</button>
           </div>
         </div>
       </div>
@@ -259,62 +272,37 @@
         <div class="pill" id="statProgress">Worksheet: 0/10</div>
         <div class="pill" id="statAccuracy">Accuracy: 100%</div>
         <div class="pill" id="statAvgTime">Avg time: 0.0s</div>
-        <div class="pill" id="statFluency">Timer: off</div>
         <div class="pill" id="statMastery">Mastery: Not yet</div>
       </div>
     </div>
 
-    <div class="grid2">
-      <div class="card">
-        <div class="stepTitle" id="stepTitle">Press Start</div>
+    <div class="practiceCard">
+      <div class="content">
+        <div class="topRow">
+          <span class="badge" id="kindBadge">READY</span>
+          <span class="pill" id="itemTitlePill">Item: -</span>
+        </div>
 
-        <div class="contentBox">
-          <div class="modeRow">
-            <span class="modeBadge" id="modeBadge">Mode</span>
-            <span class="pill" id="itemKindPill">Item: -</span>
+        <div class="readingBox">
+          <div class="titleLine">
+            <span id="itemTitle">Press Start</span>
+            <span id="difficultyHint" style="opacity:.88; font-weight:850;"></span>
           </div>
+          <div class="bigText" id="readingText">Press Start to begin.</div>
 
-          <div class="visualRow">
-            <div>
-              <div class="bigText" id="readingText">Press Start to begin.</div>
-
-              <div class="timerRow">
-                <button class="timerBtn" id="startTimerBtn">Start 1-min Timer</button>
-                <button class="timerBtn" id="stopTimerBtn">Stop Timer</button>
-                <div class="pill" id="timerPill">Timer: 0:00</div>
-              </div>
-
-              <div class="qaWrap" id="qaWrap" style="display:none;">
-                <div class="question" id="questionText"></div>
-                <div class="choices" id="choices"></div>
-              </div>
-
-              <div class="answerRow">
-                <button class="primary" id="markCorrectBtn">Mark Correct</button>
-                <button id="markWrongBtn">Mark Incorrect</button>
-                <button id="nextBtn">Next</button>
-              </div>
-
-              <div class="feedback" id="feedback"></div>
-              <div class="hint">For fluency, start the timer and read out loud. For questions, tap an answer.</div>
-            </div>
-
-            <div class="illustration" id="illustrationBox" aria-label="Picture"></div>
+          <div class="qaWrap" id="qaWrap" style="display:none;">
+            <div class="question" id="questionText"></div>
+            <div class="choices" id="choices"></div>
           </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="historyHeader">
-          <div class="historyTitle">Daily worksheet history</div>
-          <div class="rowBtns">
-            <button id="todayOnlyBtn">Today</button>
-            <button id="allHistoryBtn">All</button>
-            <button id="clearHistoryBtn">Clear history</button>
-          </div>
+        <div class="actions">
+          <button class="primary" id="markCorrectBtn">Correct</button>
+          <button id="markWrongBtn">Incorrect</button>
+          <button id="nextBtn">Next</button>
         </div>
-        <div class="smallNote">Saved in this browser (localStorage). Each completed worksheet is logged.</div>
-        <div class="historyList" id="historyList"></div>
+
+        <div class="feedback" id="feedback"></div>
       </div>
     </div>
   </div>
@@ -323,8 +311,53 @@
 
 <script>
 (() => {
-  // ===================== CONTENT =====================
-  // WORD BANK (fluency)
+  const DEFAULT_COUNT = 10; // fixed (no UI)
+
+  // No repeats within or across worksheets (per selected practice type).
+  // Persisted to localStorage so reloads do NOT reintroduce repeats.
+  // Use Clear History to allow repeats again.
+  const usedByMode = Object.create(null); // { [modeKey]: Set<string> }
+  const MAX_UNIQUE_TRIES = 4000;
+  const STORAGE_KEY = "RP_USED_ITEMS_V1";
+  let saveTimer = null;
+  let dirtySave = false;
+
+  (function initUsedFromStorage(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj !== "object") return;
+      for (const [k, arr] of Object.entries(obj)) {
+        if (!Array.isArray(arr)) continue;
+        usedByMode[k] = new Set(arr.filter(x => typeof x === "string"));
+      }
+    } catch {}
+  })();
+
+  function scheduleSaveUsed(){
+    dirtySave = true;
+    if (saveTimer) return;
+    saveTimer = setTimeout(() => {
+      saveTimer = null;
+      if (!dirtySave) return;
+      dirtySave = false;
+      try {
+        const out = {};
+        for (const [k, set] of Object.entries(usedByMode)) {
+          if (set && set.size) out[k] = Array.from(set);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+      } catch {}
+    }, 300);
+  }
+
+  function getUsedSet(modeKey) {
+    if (!usedByMode[modeKey]) usedByMode[modeKey] = new Set();
+    return usedByMode[modeKey];
+  }
+
+  // ========= CONTENT BANKS (from the original reading practice file) =========
   const WORD_BANK = {
     1: { A:["a","I","see","the","to","and","is","in","it","on","at","we","go","me","my","up","can","like","am","you"],
          B:["with","this","that","have","said","look","come","here","play","from","little","down","help","make","jump","blue","yellow","happy","rain"],
@@ -340,7 +373,6 @@
          C:["accomplish","approximately","collaboration","distribution","extraordinary","fundamental","implementation","optimization","productivity","recommendation"] }
   };
 
-  // SENTENCE CLOZE (choose the best word)
   const SENTENCE_TEMPLATES = {
     1: [
       { t:"I see a ___ .", blanks:["cat","dog","hat","bus","sun","cup"] },
@@ -368,12 +400,6 @@
     ]
   };
 
-  // PHONICS BANKS
-  // Drill types:
-  // 1) "grapheme_sound": choose the word that matches a letter pattern (sh, ch, th, ee, oa, igh, ar, or, er)
-  // 2) "cvc_blend": blend CVC (c-a-t => cat) choose the correct word
-  // 3) "blend_cluster": choose a word with an initial blend (st, bl, cr, fr, tr)
-  // 4) "morphology": choose correct meaning/word with prefix/suffix (grade 4)
   const PHONICS = {
     1: {
       A: { type:"cvc_blend", sets:[
@@ -457,160 +483,88 @@
     }
   };
 
-  // PASSAGES with themes for built-in SVG illustrations
   const PASSAGES = {
     1: [
-      { theme:"rain", title:"A Rainy Walk",
-        text:"It is raining. Mia puts on her boots. She walks to the door. Splash! The puddle is big. Mia smiles.",
+      { title:"A Rainy Walk", text:"It is raining. Mia puts on her boots. She walks to the door. Splash! The puddle is big. Mia smiles.",
         q:{ question:"Why does Mia put on boots?", choices:["Because it is raining","Because it is snowing","Because it is hot","Because it is dark"], answerIndex:0 } },
-      { theme:"couch", title:"The Lost Ball",
-        text:"A ball rolls under the couch. Ben looks left and right. He uses a flashlight. He finds the ball and cheers.",
+      { title:"The Lost Ball", text:"A ball rolls under the couch. Ben looks left and right. He uses a flashlight. He finds the ball and cheers.",
         q:{ question:"Where does the ball roll?", choices:["Under the couch","Into the sink","On the roof","Behind the tree"], answerIndex:0 } },
-      { theme:"pet", title:"A New Pet",
-        text:"Tara feeds her fish each morning. The fish swims in circles. Tara taps the glass gently. The fish wiggles its tail.",
+      { title:"A New Pet", text:"Tara feeds her fish each morning. The fish swims in circles. Tara taps the glass gently. The fish wiggles its tail.",
         q:{ question:"What does Tara do each morning?", choices:["Feeds the fish","Cleans the roof","Paints the glass","Hides the tail"], answerIndex:0 } },
-      { theme:"kite", title:"Kite Day",
-        text:"The wind is strong. Leo holds the kite string. The kite rises up high. Leo runs and laughs.",
+      { title:"Kite Day", text:"The wind is strong. Leo holds the kite string. The kite rises up high. Leo runs and laughs.",
         q:{ question:"What helps the kite go up?", choices:["The wind","The sand","The snow","The puddle"], answerIndex:0 } }
     ],
     2: [
-      { theme:"garden", title:"The Garden Plan",
-        text:"Lena wants a small garden. She draws a plan on paper. She plants seeds in rows. Each day she waters them and checks for sprouts.",
+      { title:"The Garden Plan", text:"Lena wants a small garden. She draws a plan on paper. She plants seeds in rows. Each day she waters them and checks for sprouts.",
         q:{ question:"What does Lena do each day?", choices:["Waters the seeds","Moves the rows","Hides the sprouts","Counts the paper"], answerIndex:0 } },
-      { theme:"neighbors", title:"A Helpful Neighbor",
-        text:"Mr. Kim carries a heavy box. Maya sees him and offers help. Together they carry it to the porch. Mr. Kim says thank you.",
+      { title:"A Helpful Neighbor", text:"Mr. Kim carries a heavy box. Maya sees him and offers help. Together they carry it to the porch. Mr. Kim says thank you.",
         q:{ question:"How do they solve the problem?", choices:["They work together","They ignore the box","They break the box","They hide the porch"], answerIndex:0 } },
-      { theme:"library", title:"Quiet Corner",
-        text:"In the library, Noor whispers to her friend. They pick a book about space. They sit in a quiet corner and read.",
+      { title:"Quiet Corner", text:"In the library, Noor whispers to her friend. They pick a book about space. They sit in a quiet corner and read.",
         q:{ question:"Where do they read?", choices:["In a quiet corner","On a noisy street","Inside a bus","Under a slide"], answerIndex:0 } },
-      { theme:"storm", title:"Storm Check",
-        text:"Dark clouds fill the sky. Jay checks the weather report. He decides to bring a jacket and stay near home.",
+      { title:"Storm Check", text:"Dark clouds fill the sky. Jay checks the weather report. He decides to bring a jacket and stay near home.",
         q:{ question:"Why does Jay bring a jacket?", choices:["Because dark clouds appear","Because the sun is bright","Because the day is hot","Because the sky is clear"], answerIndex:0 } }
     ],
     3: [
-      { theme:"bridge", title:"Testing a Bridge",
-        text:"A class builds a model bridge. First they predict how much weight it can hold. Then they add coins one at a time. They record the number of coins before the bridge bends.",
+      { title:"Testing a Bridge", text:"A class builds a model bridge. First they predict how much weight it can hold. Then they add coins one at a time. They record the number of coins before the bridge bends.",
         q:{ question:"What do they do after making a prediction?", choices:["Add coins one at a time","Paint the bridge blue","Throw away the coins","Stop the test"], answerIndex:0 } },
-      { theme:"weather", title:"A Pattern in Weather",
-        text:"For two weeks, Amir tracks the weather. He notices that clouds often arrive in the afternoon. He writes this pattern in a notebook and shares it with his class.",
+      { title:"A Pattern in Weather", text:"For two weeks, Amir tracks the weather. He notices that clouds often arrive in the afternoon. He writes this pattern in a notebook and shares it with his class.",
         q:{ question:"What pattern does Amir notice?", choices:["Clouds arrive in the afternoon","Snow falls every night","Rain stops forever","Wind disappears in winter"], answerIndex:0 } },
-      { theme:"robot", title:"Robot Helper",
-        text:"Kai programs a small robot to follow a line on the floor. The robot sometimes turns too early. Kai changes one setting and tests again. After a few tries, the robot moves smoothly.",
+      { title:"Robot Helper", text:"Kai programs a small robot to follow a line on the floor. The robot sometimes turns too early. Kai changes one setting and tests again. After a few tries, the robot moves smoothly.",
         q:{ question:"How does Kai improve the robot?", choices:["Changes a setting and tests again","Stops testing forever","Unplugs the robot","Moves the floor"], answerIndex:0 } },
-      { theme:"recycle", title:"Recycling Team",
-        text:"A school wants less trash. Students place clear labels on bins. They teach younger kids what goes where. After a month, the school throws away fewer bottles.",
+      { title:"Recycling Team", text:"A school wants less trash. Students place clear labels on bins. They teach younger kids what goes where. After a month, the school throws away fewer bottles.",
         q:{ question:"What helps reduce trash?", choices:["Labels and teaching","Hiding the bins","Removing labels","Throwing more bottles"], answerIndex:0 } }
     ],
     4: [
-      { theme:"system", title:"Improving a System",
-        text:"A library wants shorter wait times. Staff measure how long checkouts take. They rearrange the counter and label shelves clearly. After a week, the average wait time decreases.",
+      { title:"Improving a System", text:"A library wants shorter wait times. Staff measure how long checkouts take. They rearrange the counter and label shelves clearly. After a week, the average wait time decreases.",
         q:{ question:"What helps reduce wait time?", choices:["Rearranging and labeling clearly","Removing all books","Closing the library","Hiding the shelves"], answerIndex:0 } },
-      { theme:"plants", title:"Evidence and Claims",
-        text:"A student claims that plants grow faster with more light. She tests two groups of plants, changing only the light. She measures growth and shows the results in a chart.",
+      { title:"Evidence and Claims", text:"A student claims that plants grow faster with more light. She tests two groups of plants, changing only the light. She measures growth and shows the results in a chart.",
         q:{ question:"What makes her claim stronger?", choices:["Testing and measuring results","Guessing the answer","Changing many things at once","Skipping the chart"], answerIndex:0 } },
-      { theme:"city", title:"City Buses",
-        text:"A city wants buses to arrive on time. Engineers study traffic at busy intersections. They adjust signal timing and add bus-only lanes on one road. Late arrivals drop.",
+      { title:"City Buses", text:"A city wants buses to arrive on time. Engineers study traffic at busy intersections. They adjust signal timing and add bus-only lanes on one road. Late arrivals drop.",
         q:{ question:"Which action supports on-time buses?", choices:["Adjusting signals and adding a bus lane","Making roads narrower","Stopping all buses","Removing signals"], answerIndex:0 } },
-      { theme:"lab", title:"A Careful Investigation",
-        text:"A team tests a new material. They change only one variable at a time. They repeat the test and compare results. This helps them trust the conclusion.",
+      { title:"A Careful Investigation", text:"A team tests a new material. They change only one variable at a time. They repeat the test and compare results. This helps them trust the conclusion.",
         q:{ question:"Why change one variable at a time?", choices:["To understand cause and effect","To make results random","To avoid repeating tests","To make it confusing"], answerIndex:0 } }
     ]
   };
 
-  // ===================== STEPS =====================
-  // Modes: phonics, words, sentence, passage
-  const STEPS = {
-    1: [
-      { letter:"A", id:"R1-A1", name:"A1: Phonics CVC", desc:"Blend simple CVC words.", mode:"phonics", mastery:{acc:0.90, time:10} },
-      { letter:"B", id:"R1-B1", name:"B1: Phonics digraphs", desc:"sh, ch, th, ck patterns.", mode:"phonics", mastery:{acc:0.88, time:12} },
-      { letter:"C", id:"R1-C1", name:"C1: Short passages", desc:"Read and answer one question.", mode:"passage", mastery:{acc:0.85, time:22} },
-    ],
-    2: [
-      { letter:"A", id:"R2-A1", name:"A1: Phonics blends", desc:"st, bl, cr, fr and more.", mode:"phonics", mastery:{acc:0.90, time:12} },
-      { letter:"B", id:"R2-B1", name:"B1: Words fluency", desc:"Read words smoothly.", mode:"words", mastery:{acc:0.90, time:12} },
-      { letter:"C", id:"R2-C1", name:"C1: Passage comprehension", desc:"Read a passage and answer.", mode:"passage", mastery:{acc:0.85, time:24} },
-    ],
-    3: [
-      { letter:"A", id:"R3-A1", name:"A1: Vowel teams", desc:"ee, oa, igh, ar, or, er.", mode:"phonics", mastery:{acc:0.88, time:14} },
-      { letter:"B", id:"R3-B1", name:"B1: Sentence meaning", desc:"Choose the best word.", mode:"sentence", mastery:{acc:0.85, time:18} },
-      { letter:"C", id:"R3-C1", name:"C1: Passages", desc:"Read and answer.", mode:"passage", mastery:{acc:0.85, time:26} },
-    ],
-    4: [
-      { letter:"A", id:"R4-A1", name:"A1: Prefixes", desc:"re-, mis-, pre-, trans-.", mode:"phonics", mastery:{acc:0.88, time:18} },
-      { letter:"B", id:"R4-B1", name:"B1: Advanced words", desc:"Academic vocabulary.", mode:"words", mastery:{acc:0.90, time:16} },
-      { letter:"C", id:"R4-C1", name:"C1: Informational passages", desc:"Read and answer.", mode:"passage", mastery:{acc:0.85, time:28} },
-    ]
+  // ========= MODES =========
+  const MODES = {
+    phonics_easy:  { label:"Phonics – easy",     grades:[1,2], kinds:["phonics"], mastery:{acc:0.90, time:18} },
+    phonics_hard:  { label:"Phonics – difficult",grades:[3,4], kinds:["phonics"], mastery:{acc:0.88, time:22} },
+    words_easy:    { label:"Words – easy",       grades:[1,2], kinds:["words"],   mastery:{acc:0.90, time:20} },
+    words_hard:    { label:"Words – difficult",  grades:[3,4], kinds:["words"],   mastery:{acc:0.88, time:22} },
+    sentence_easy: { label:"Sentences – easy",   grades:[1,2], kinds:["sentence"],mastery:{acc:0.88, time:24} },
+    sentence_hard: { label:"Sentences – difficult",grades:[3,4],kinds:["sentence"],mastery:{acc:0.85, time:26} },
+    passage_easy:  { label:"Passages – easy",    grades:[1,2], kinds:["passage"], mastery:{acc:0.85, time:28} },
+    passage_hard:  { label:"Passages – difficult",grades:[3,4],kinds:["passage"], mastery:{acc:0.85, time:32} },
+    mix_easy:      { label:"Mix – easy",         grades:[1,2], kinds:["phonics","words","sentence","passage"], mastery:{acc:0.88, time:26} },
+    mix_hard:      { label:"Mix – difficult",    grades:[3,4], kinds:["phonics","words","sentence","passage"], mastery:{acc:0.85, time:30} },
   };
 
-  // ===================== STORAGE =====================
-  const HISTORY_KEY = "kumon_reading_phonics_history_v1";
-
-  function todayISO() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-  function loadHistory() {
-    try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      if (!raw) return [];
-      const arr = JSON.parse(raw);
-      return Array.isArray(arr) ? arr : [];
-    } catch { return []; }
-  }
-  function saveHistory(arr) { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }
-  function addHistoryEntry(entry) {
-    const hist = loadHistory();
-    hist.unshift(entry);
-    if (hist.length > 120) hist.length = 120;
-    saveHistory(hist);
-  }
-
-  // ===================== STATE =====================
+  // ========= STATE =========
   const state = {
     current: null,
     started: false,
-    setTarget: 10,
+    setTarget: DEFAULT_COUNT,
     setDone: 0,
     correct: 0,
     total: 0,
     perItemTimes: [],
     itemStartTs: null,
     sessionStartTs: Date.now(),
-    autoAdvance: true,
-    passedThisWorksheet: false,
-    historyFilter: "today",
-    timerRunning: false,
-    timerStart: 0,
-    timerInterval: null,
   };
 
-  // ===================== ELEMENTS =====================
+  // ========= ELEMENTS =========
   const el = {
-    grade: document.getElementById("grade"),
-    step: document.getElementById("step"),
-    stepDesc: document.getElementById("stepDesc"),
-    stepTitle: document.getElementById("stepTitle"),
-    targetCount: document.getElementById("targetCount"),
+    mode: document.getElementById("mode"),
     startBtn: document.getElementById("startBtn"),
     printBtn: document.getElementById("printBtn"),
-    skipBtn: document.getElementById("skipBtn"),
-    resetStatsBtn: document.getElementById("resetStatsBtn"),
-    toggleAutoAdvanceBtn: document.getElementById("toggleAutoAdvanceBtn"),
+    clearHistoryBtn: document.getElementById("clearHistoryBtn"),
 
-    statProgress: document.getElementById("statProgress"),
-    statAccuracy: document.getElementById("statAccuracy"),
-    statAvgTime: document.getElementById("statAvgTime"),
-    statFluency: document.getElementById("statFluency"),
-    statMastery: document.getElementById("statMastery"),
-    sessionClock: document.getElementById("sessionClock"),
-
-    modeBadge: document.getElementById("modeBadge"),
-    itemKindPill: document.getElementById("itemKindPill"),
+    kindBadge: document.getElementById("kindBadge"),
+    itemTitlePill: document.getElementById("itemTitlePill"),
+    itemTitle: document.getElementById("itemTitle"),
+    difficultyHint: document.getElementById("difficultyHint"),
     readingText: document.getElementById("readingText"),
-    illustrationBox: document.getElementById("illustrationBox"),
 
     qaWrap: document.getElementById("qaWrap"),
     questionText: document.getElementById("questionText"),
@@ -621,20 +575,17 @@
     markWrongBtn: document.getElementById("markWrongBtn"),
     nextBtn: document.getElementById("nextBtn"),
 
-    startTimerBtn: document.getElementById("startTimerBtn"),
-    stopTimerBtn: document.getElementById("stopTimerBtn"),
-    timerPill: document.getElementById("timerPill"),
-
-    historyList: document.getElementById("historyList"),
-    todayOnlyBtn: document.getElementById("todayOnlyBtn"),
-    allHistoryBtn: document.getElementById("allHistoryBtn"),
-    clearHistoryBtn: document.getElementById("clearHistoryBtn"),
+    statProgress: document.getElementById("statProgress"),
+    statAccuracy: document.getElementById("statAccuracy"),
+    statAvgTime: document.getElementById("statAvgTime"),
+    statMastery: document.getElementById("statMastery"),
+    sessionClock: document.getElementById("sessionClock"),
+    clockNow: document.getElementById("clockNow"),
 
     printArea: document.getElementById("printArea"),
   };
 
-  // ===================== HELPERS =====================
-  const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+  // ========= HELPERS =========
   const randInt = (min,maxInc) => Math.floor(Math.random()*(maxInc-min+1))+min;
 
   function setFeedback(msg, kind) {
@@ -648,30 +599,39 @@
     return sum / state.perItemTimes.length;
   }
 
-  function getSelectedStepObj() {
-    const g = Number(el.grade.value);
-    const idx = Number(el.step.value || 0);
-    return STEPS[g][idx];
+  function getModeKey() { return el.mode.value || "mix_easy"; }
+  function getModeObj(key=getModeKey()) { return MODES[key] || MODES.mix_easy; }
+
+  function signatureForItem(item) {
+    // For repeat prevention, treat an item as the pair (kind, text, question+choices).
+    // Keep it deterministic and stable.
+    const kind = item.kind || "";
+    const title = item.title || "";
+    const text = item.text || "";
+    let q = "";
+    if (item.question) {
+      const qq = item.question;
+      const qText = qq.question || "";
+      const choices = Array.isArray(qq.choices) ? qq.choices.join("|") : "";
+      const ai = (typeof qq.answerIndex === "number") ? String(qq.answerIndex) : "";
+      q = `Q:${qText}|C:${choices}|A:${ai}`;
+    }
+    // Compact signature
+    return `${kind}#${title}#${text}#${q}`;
   }
 
-  function updateStepDropdown() {
-    const g = Number(el.grade.value);
-    const steps = STEPS[g];
-    el.step.innerHTML = "";
-    steps.forEach((s,i) => {
-      const opt = document.createElement("option");
-      opt.value = String(i);
-      opt.textContent = `${s.letter} | ${s.name}`;
-      el.step.appendChild(opt);
-    });
-    el.step.value = "0";
-    updateStepDescription();
-  }
-
-  function updateStepDescription() {
-    const s = getSelectedStepObj();
-    el.stepDesc.textContent = `${s.desc}  Mastery: ≥${Math.round(s.mastery.acc*100)}% and ≤${s.mastery.time.toFixed(0)}s avg`;
-    el.stepTitle.textContent = `${s.id}  |  ${s.desc}`;
+  function generateUniqueItem(modeKey) {
+    const used = getUsedSet(modeKey);
+    for (let i = 0; i < MAX_UNIQUE_TRIES; i++) {
+      const it = generateItemForMode(modeKey);
+      const sig = signatureForItem(it);
+      if (!used.has(sig)) {
+        used.add(sig);
+        scheduleSaveUsed();
+        return it;
+      }
+    }
+    return null;
   }
 
   function updateStats() {
@@ -679,198 +639,32 @@
     const acc = state.total ? Math.round((state.correct / state.total) * 100) : 100;
     el.statAccuracy.textContent = `Accuracy: ${acc}%`;
     el.statAvgTime.textContent = `Avg time: ${computeAvgTime().toFixed(1)}s`;
-    el.statFluency.textContent = state.timerRunning ? "Timer: running" : "Timer: off";
 
     const mastery = checkMastery(false);
     el.statMastery.textContent = mastery.passed ? "Mastery: PASS" : "Mastery: Not yet";
     el.statMastery.className = "pill " + (mastery.passed ? "ok" : "");
   }
 
-  // ===================== ILLUSTRATIONS (INLINE SVG) =====================
-  function svgWrap(inner) {
-    return `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cartoon illustration">
-      <rect x="0" y="0" width="320" height="220" rx="18" fill="rgba(255,255,255,0.04)"/>
-      ${inner}
-    </svg>`;
+  function clearChoices() {
+    el.choices.innerHTML = "";
+    el.qaWrap.style.display = "none";
+  }
+  function lockChoices() {
+    Array.from(el.choices.querySelectorAll("button")).forEach(b => b.disabled = true);
   }
 
-  function illustrationForTheme(theme) {
-    const sky = `<rect x="14" y="14" width="292" height="120" rx="16" fill="rgba(120,180,255,0.18)"/>`;
-    const ground = `<rect x="14" y="132" width="292" height="74" rx="16" fill="rgba(120,255,176,0.10)"/>`;
+  // ========= ITEM GENERATORS =========
+  function pickGrade(grades) { return grades[randInt(0, grades.length-1)]; }
 
-    const themes = {
-      rain: svgWrap(`
-        ${sky}${ground}
-        <circle cx="60" cy="55" r="22" fill="rgba(255,255,255,0.22)"/>
-        <circle cx="82" cy="50" r="18" fill="rgba(255,255,255,0.22)"/>
-        <circle cx="102" cy="58" r="22" fill="rgba(255,255,255,0.22)"/>
-        <path d="M56 92 C56 82 70 82 70 92 C70 102 56 102 56 92 Z" fill="rgba(120,180,255,0.55)"/>
-        <path d="M86 98 C86 88 100 88 100 98 C100 108 86 108 86 98 Z" fill="rgba(120,180,255,0.55)"/>
-        <path d="M116 90 C116 80 130 80 130 90 C130 100 116 100 116 90 Z" fill="rgba(120,180,255,0.55)"/>
-        <ellipse cx="185" cy="178" rx="70" ry="18" fill="rgba(120,180,255,0.30)"/>
-        <circle cx="215" cy="150" r="18" fill="rgba(255,255,255,0.18)"/>
-        <rect x="205" y="168" width="20" height="28" rx="8" fill="rgba(255,255,255,0.18)"/>
-      `),
-      couch: svgWrap(`
-        ${sky}${ground}
-        <rect x="60" y="120" width="200" height="70" rx="18" fill="rgba(255,255,255,0.18)"/>
-        <rect x="70" y="108" width="180" height="32" rx="14" fill="rgba(255,255,255,0.16)"/>
-        <circle cx="110" cy="185" r="14" fill="rgba(255,180,120,0.60)"/>
-        <circle cx="220" cy="185" r="14" fill="rgba(255,180,120,0.60)"/>
-        <circle cx="160" cy="170" r="10" fill="rgba(120,180,255,0.55)"/>
-        <rect x="154" y="175" width="12" height="6" rx="3" fill="rgba(120,180,255,0.55)"/>
-      `),
-      pet: svgWrap(`
-        ${sky}${ground}
-        <rect x="110" y="70" width="120" height="120" rx="24" fill="rgba(120,180,255,0.18)"/>
-        <rect x="120" y="80" width="100" height="100" rx="18" fill="rgba(120,180,255,0.22)"/>
-        <circle cx="165" cy="130" r="16" fill="rgba(255,180,120,0.70)"/>
-        <path d="M180 130 C194 122 202 128 202 138 C196 138 188 136 180 130 Z" fill="rgba(255,180,120,0.70)"/>
-        <circle cx="155" cy="126" r="3" fill="rgba(0,0,0,0.45)"/>
-        <circle cx="170" cy="126" r="3" fill="rgba(0,0,0,0.45)"/>
-        <path d="M160 138 C166 146 174 146 180 138" stroke="rgba(255,255,255,0.35)" stroke-width="3" fill="none" stroke-linecap="round"/>
-      `),
-      kite: svgWrap(`
-        ${sky}${ground}
-        <path d="M260 40 C240 30 220 34 210 52 C240 54 250 60 260 76 C272 62 275 50 260 40 Z" fill="rgba(255,255,255,0.20)"/>
-        <polygon points="140,40 180,80 140,120 100,80" fill="rgba(255,138,161,0.40)"/>
-        <line x1="140" y1="120" x2="120" y2="190" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
-        <circle cx="110" cy="190" r="14" fill="rgba(255,180,120,0.65)"/>
-      `),
-      garden: svgWrap(`
-        ${sky}${ground}
-        <rect x="70" y="150" width="180" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
-        <circle cx="110" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
-        <circle cx="160" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
-        <circle cx="210" cy="148" r="10" fill="rgba(120,255,176,0.40)"/>
-        <rect x="154" y="96" width="12" height="42" rx="6" fill="rgba(255,255,255,0.18)"/>
-        <path d="M150 110 C138 100 132 112 142 120" fill="rgba(120,255,176,0.35)"/>
-        <path d="M170 110 C182 100 188 112 178 120" fill="rgba(120,255,176,0.35)"/>
-      `),
-      neighbors: svgWrap(`
-        ${sky}${ground}
-        <rect x="120" y="110" width="80" height="70" rx="12" fill="rgba(255,255,255,0.16)"/>
-        <rect x="110" y="92" width="100" height="26" rx="10" fill="rgba(255,255,255,0.12)"/>
-        <circle cx="95" cy="178" r="14" fill="rgba(255,180,120,0.65)"/>
-        <circle cx="225" cy="178" r="14" fill="rgba(255,180,120,0.65)"/>
-        <line x1="109" y1="172" x2="121" y2="162" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linecap="round"/>
-        <line x1="211" y1="172" x2="199" y2="162" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linecap="round"/>
-      `),
-      library: svgWrap(`
-        ${sky}${ground}
-        <rect x="60" y="70" width="200" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
-        <rect x="80" y="90" width="160" height="16" rx="8" fill="rgba(120,180,255,0.20)"/>
-        <rect x="80" y="114" width="160" height="16" rx="8" fill="rgba(255,138,161,0.16)"/>
-        <rect x="80" y="138" width="160" height="16" rx="8" fill="rgba(120,255,176,0.16)"/>
-        <rect x="120" y="162" width="80" height="22" rx="10" fill="rgba(255,255,255,0.16)"/>
-      `),
-      storm: svgWrap(`
-        ${sky}${ground}
-        <circle cx="90" cy="55" r="24" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="120" cy="52" r="22" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="150" cy="58" r="26" fill="rgba(255,255,255,0.20)"/>
-        <polygon points="140,76 120,118 142,118 128,156 170,110 146,110 160,76" fill="rgba(255,255,255,0.22)"/>
-        ${ground}
-        <circle cx="240" cy="165" r="18" fill="rgba(255,180,120,0.65)"/>
-        <rect x="232" y="182" width="16" height="18" rx="8" fill="rgba(255,255,255,0.16)"/>
-      `),
-      bridge: svgWrap(`
-        ${sky}${ground}
-        <rect x="40" y="158" width="240" height="10" rx="5" fill="rgba(255,255,255,0.18)"/>
-        <path d="M60 158 C90 120 120 120 150 158" stroke="rgba(120,180,255,0.45)" stroke-width="6" fill="none"/>
-        <path d="M170 158 C200 120 230 120 260 158" stroke="rgba(120,180,255,0.45)" stroke-width="6" fill="none"/>
-        <circle cx="110" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
-        <circle cx="130" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
-        <circle cx="150" cy="145" r="7" fill="rgba(255,180,120,0.70)"/>
-      `),
-      weather: svgWrap(`
-        ${sky}${ground}
-        <circle cx="70" cy="55" r="18" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="92" cy="50" r="16" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="112" cy="58" r="18" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="220" cy="60" r="20" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="244" cy="54" r="18" fill="rgba(255,255,255,0.20)"/>
-        <circle cx="262" cy="62" r="20" fill="rgba(255,255,255,0.20)"/>
-        <rect x="70" y="145" width="180" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
-        <rect x="92" y="155" width="60" height="8" rx="4" fill="rgba(120,180,255,0.40)"/>
-        <rect x="92" y="168" width="90" height="8" rx="4" fill="rgba(120,255,176,0.25)"/>
-      `),
-      robot: svgWrap(`
-        ${sky}${ground}
-        <rect x="120" y="70" width="80" height="90" rx="16" fill="rgba(255,255,255,0.16)"/>
-        <rect x="138" y="56" width="44" height="22" rx="10" fill="rgba(255,255,255,0.12)"/>
-        <circle cx="148" cy="108" r="6" fill="rgba(120,180,255,0.55)"/>
-        <circle cx="172" cy="108" r="6" fill="rgba(120,180,255,0.55)"/>
-        <rect x="140" y="126" width="40" height="8" rx="4" fill="rgba(255,138,161,0.25)"/>
-        <rect x="108" y="160" width="104" height="10" rx="5" fill="rgba(255,255,255,0.14)"/>
-      `),
-      recycle: svgWrap(`
-        ${sky}${ground}
-        <rect x="70" y="90" width="70" height="100" rx="14" fill="rgba(120,255,176,0.12)"/>
-        <rect x="180" y="90" width="70" height="100" rx="14" fill="rgba(120,180,255,0.12)"/>
-        <path d="M105 120 L115 110 L125 120" stroke="rgba(120,255,176,0.45)" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M215 120 L225 110 L235 120" stroke="rgba(120,180,255,0.45)" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <circle cx="130" cy="175" r="10" fill="rgba(255,180,120,0.65)"/>
-        <circle cx="190" cy="175" r="10" fill="rgba(255,180,120,0.65)"/>
-      `),
-      system: svgWrap(`
-        ${sky}${ground}
-        <rect x="70" y="70" width="180" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
-        <rect x="92" y="92" width="136" height="18" rx="9" fill="rgba(120,180,255,0.20)"/>
-        <rect x="92" y="118" width="136" height="18" rx="9" fill="rgba(255,138,161,0.16)"/>
-        <rect x="92" y="144" width="136" height="18" rx="9" fill="rgba(120,255,176,0.16)"/>
-        <circle cx="260" cy="175" r="14" fill="rgba(255,180,120,0.65)"/>
-      `),
-      plants: svgWrap(`
-        ${sky}${ground}
-        <rect x="70" y="150" width="60" height="40" rx="12" fill="rgba(255,255,255,0.10)"/>
-        <rect x="190" y="150" width="60" height="40" rx="12" fill="rgba(255,255,255,0.10)"/>
-        <rect x="96" y="120" width="8" height="30" rx="4" fill="rgba(255,255,255,0.18)"/>
-        <path d="M100 132 C86 122 82 136 92 144" fill="rgba(120,255,176,0.35)"/>
-        <path d="M108 132 C122 122 126 136 116 144" fill="rgba(120,255,176,0.35)"/>
-        <rect x="216" y="105" width="8" height="45" rx="4" fill="rgba(255,255,255,0.18)"/>
-        <path d="M220 118 C204 108 198 124 210 134" fill="rgba(120,255,176,0.35)"/>
-        <path d="M228 118 C244 108 250 124 238 134" fill="rgba(120,255,176,0.35)"/>
-        <circle cx="250" cy="55" r="18" fill="rgba(255,255,255,0.18)"/>
-        <circle cx="250" cy="55" r="10" fill="rgba(255,255,255,0.24)"/>
-      `),
-      city: svgWrap(`
-        ${sky}${ground}
-        <rect x="50" y="140" width="220" height="40" rx="16" fill="rgba(255,255,255,0.10)"/>
-        <rect x="90" y="110" width="140" height="40" rx="14" fill="rgba(120,180,255,0.18)"/>
-        <circle cx="110" cy="150" r="10" fill="rgba(255,255,255,0.16)"/>
-        <circle cx="210" cy="150" r="10" fill="rgba(255,255,255,0.16)"/>
-        <rect x="250" y="92" width="26" height="90" rx="10" fill="rgba(255,255,255,0.10)"/>
-        <circle cx="263" cy="115" r="6" fill="rgba(255,138,161,0.20)"/>
-        <circle cx="263" cy="135" r="6" fill="rgba(120,255,176,0.20)"/>
-      `),
-      lab: svgWrap(`
-        ${sky}${ground}
-        <rect x="70" y="70" width="180" height="120" rx="16" fill="rgba(255,255,255,0.12)"/>
-        <rect x="92" y="92" width="60" height="70" rx="14" fill="rgba(120,180,255,0.16)"/>
-        <rect x="160" y="92" width="68" height="70" rx="14" fill="rgba(255,138,161,0.12)"/>
-        <path d="M104 110 L140 110" stroke="rgba(255,255,255,0.20)" stroke-width="4" stroke-linecap="round"/>
-        <path d="M172 120 L216 120" stroke="rgba(255,255,255,0.20)" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="250" cy="175" r="14" fill="rgba(255,180,120,0.65)"/>
-      `)
-    };
+  function makeWordsItem(grade) {
+    const letters = Object.keys(WORD_BANK[grade] || {A:[]});
+    const letter = letters[randInt(0, letters.length-1)] || "A";
+    const pool = (WORD_BANK[grade] && WORD_BANK[grade][letter]) ? WORD_BANK[grade][letter] : (WORD_BANK[grade] ? WORD_BANK[grade].A : []);
 
-    return themes[theme] || svgWrap(`${sky}${ground}<circle cx="160" cy="110" r="44" fill="rgba(255,255,255,0.10)"/>`);
-  }
-
-  // ===================== ITEM GENERATORS =====================
-  function makeWordsItem(grade, letter) {
-    const pool = WORD_BANK[grade][letter] || WORD_BANK[grade]["A"];
     const count = grade <= 2 ? 8 : 10;
     const picked = [];
     for (let i=0; i<count; i++) picked.push(pool[randInt(0, pool.length-1)]);
-    return {
-      kind:"words",
-      title:"Word Fluency",
-      text: picked.join("   "),
-      theme: "library",
-      question: null
-    };
+    return { kind:"words", title:"Word Fluency", text:picked.join("   "), question:null };
   }
 
   function makeSentenceItem(grade) {
@@ -883,12 +677,10 @@
       if (w !== correct && !distract.includes(w)) distract.push(w);
     }
     const choices = [correct, ...distract].sort(() => Math.random() - 0.5);
-
     return {
       kind:"sentence",
       title:"Sentence Meaning",
       text: templ.t.replace("___", "_____"),
-      theme: "neighbors",
       question: { question:"Choose the best word to fill the blank.", choices, answerIndex: choices.indexOf(correct) }
     };
   }
@@ -899,74 +691,71 @@
       kind:"passage",
       title: p.title,
       text: p.text,
-      theme: p.theme,
       question: { question: p.q.question, choices: p.q.choices.slice(), answerIndex: p.q.answerIndex }
     };
   }
 
-  function makePhonicsItem(grade, letter) {
+  function makePhonicsItem(grade) {
+    const letters = Object.keys(PHONICS[grade] || {A:null});
+    const letter = letters[randInt(0, letters.length-1)] || "A";
     const block = PHONICS[grade][letter] || PHONICS[grade]["A"];
     const set = block.sets[randInt(0, block.sets.length-1)];
     const kind = "phonics";
 
-    // Normalize to MCQ format
     if (block.type === "cvc_blend") {
-      const letters = set.letters || [];
+      const lettersArr = set.letters || [];
       const prompt = set.prompt || "Blend the sounds. Tap the word.";
-      const text = letters.join(" - ");
+      const text = lettersArr.join(" - ");
       const answerIndex = set.choices.indexOf(set.correct);
-      return { kind, title:"Phonics Blend", text, theme:"kite", question:{ question: prompt, choices:set.choices.slice(), answerIndex } };
+      return { kind, title:"Phonics Blend", text, question:{ question: prompt, choices:set.choices.slice(), answerIndex } };
     }
-
     if (block.type === "grapheme_sound") {
       const text = `Pattern: ${set.pattern}`;
       const answerIndex = set.choices.indexOf(set.correct);
-      return { kind, title:"Phonics Pattern", text, theme:"rain", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+      return { kind, title:"Phonics Pattern", text, question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
     }
-
     if (block.type === "blend_cluster") {
       const text = `Blend: ${set.blend}`;
       const answerIndex = set.choices.indexOf(set.correct);
-      return { kind, title:"Phonics Blends", text, theme:"storm", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+      return { kind, title:"Phonics Blends", text, question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
     }
-
     // morphology
     const text = "Word Parts";
     const answerIndex = set.choices.indexOf(set.correct);
-    return { kind, title:"Word Parts", text, theme:"lab", question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
+    return { kind, title:"Word Parts", text, question:{ question: set.prompt, choices:set.choices.slice(), answerIndex } };
   }
 
-  function generateItem(step) {
-    const grade = Number(el.grade.value);
-    const letter = step.letter;
+  function generateItemForMode(modeKey) {
+    const m = getModeObj(modeKey);
+    const grade = pickGrade(m.grades);
+    const kind = m.kinds[randInt(0, m.kinds.length-1)];
 
-    if (step.mode === "phonics") return makePhonicsItem(grade, letter);
-    if (step.mode === "words") return makeWordsItem(grade, letter);
-    if (step.mode === "sentence") return makeSentenceItem(grade);
+    if (kind === "phonics") return makePhonicsItem(grade);
+    if (kind === "words") return makeWordsItem(grade);
+    if (kind === "sentence") return makeSentenceItem(grade);
     return makePassageItem(grade);
   }
 
-  // ===================== RENDERING =====================
-  function clearChoices() {
-    el.choices.innerHTML = "";
-    el.qaWrap.style.display = "none";
-  }
-
-  function lockChoices() {
-    Array.from(el.choices.querySelectorAll("button")).forEach(b => b.disabled = true);
+  // ========= RENDERING =========
+  function applyTextSizing(text) {
+    const long = (text || "").length > 160;
+    el.readingText.classList.toggle("small", long);
   }
 
   function renderItem(item) {
     state.current = item;
 
-    el.modeBadge.textContent =
+    el.kindBadge.textContent =
       item.kind === "phonics" ? "PHONICS" :
       item.kind === "words" ? "WORDS" :
       item.kind === "sentence" ? "SENTENCE" : "PASSAGE";
 
-    el.itemKindPill.textContent = `Item: ${item.title}`;
+    el.itemTitlePill.textContent = `Item: ${item.title}`;
+    el.itemTitle.textContent = item.title;
+    el.difficultyHint.textContent = getModeObj().label;
+
     el.readingText.textContent = item.text;
-    el.illustrationBox.innerHTML = illustrationForTheme(item.theme);
+    applyTextSizing(item.text);
 
     clearChoices();
 
@@ -984,7 +773,7 @@
 
       setFeedback("Tap an answer.", "");
     } else {
-      setFeedback("Read out loud. Then tap Mark Correct or Mark Incorrect.", "");
+      setFeedback("Read out loud. Then tap Correct or Incorrect.", "");
     }
   }
 
@@ -1004,20 +793,17 @@
     finalizeItem(isCorrect, true);
   }
 
-  // ===================== WORKSHEET FLOW =====================
+  // ========= WORKSHEET FLOW =========
   function startWorksheet() {
     state.started = true;
-    state.setTarget = clamp(Number(el.targetCount.value || 10), 5, 50);
+    state.setTarget = DEFAULT_COUNT;
     state.setDone = 0;
     state.correct = 0;
     state.total = 0;
     state.perItemTimes = [];
     state.itemStartTs = null;
-    state.passedThisWorksheet = false;
 
-    stopTimer();
     nextItem(true);
-    updateStepDescription();
     updateStats();
   }
 
@@ -1026,25 +812,35 @@
 
     if (!isNew && state.setDone >= state.setTarget) {
       checkMastery(true);
-      finishWorksheetAndLog();
-      maybeAutoAdvance();
       updateStats();
 
-      el.modeBadge.textContent = "DONE";
-      el.itemKindPill.textContent = "Item: -";
-      el.readingText.textContent = "Worksheet done!";
-      el.illustrationBox.innerHTML = illustrationForTheme("system");
+      el.kindBadge.textContent = "DONE";
+      el.itemTitlePill.textContent = "Item: -";
+      el.itemTitle.textContent = "Worksheet done!";
+      el.readingText.textContent = "Nice work. Press Start to begin a new worksheet.";
+      el.readingText.classList.remove("small");
       clearChoices();
-      setFeedback("Nice work. Start a new worksheet when ready.", "okText");
+      setFeedback("Worksheet complete.", "okText");
+      state.current = null;
       return;
     }
 
-    const step = getSelectedStepObj();
-    const item = generateItem(step);
+    const modeKey = getModeKey();
+    const item = generateUniqueItem(modeKey);
+    if (!item) {
+      el.kindBadge.textContent = "EXHAUSTED";
+      el.itemTitlePill.textContent = "Item: -";
+      el.itemTitle.textContent = "No more unique items";
+      el.readingText.textContent = "Switch practice type or tap Clear History.";
+      el.readingText.classList.remove("small");
+      clearChoices();
+      setFeedback("", "");
+      state.current = null;
+      return;
+    }
     renderItem(item);
     state.itemStartTs = performance.now();
 
-    updateStepDescription();
     updateStats();
   }
 
@@ -1058,160 +854,128 @@
 
     if (isCorrect) {
       state.correct += 1;
-      setFeedback(`Correct. (${dt.toFixed(1)}s)`, "okText");
+      setFeedback("Correct.", "okText");
     } else {
-      setFeedback(`Not quite. (${dt.toFixed(1)}s)`, "badText");
+      setFeedback("Not quite.", "badText");
     }
 
     updateStats();
-    stopTimer();
-
-    setTimeout(() => nextItem(false), fromChoice ? 560 : 420);
+    setTimeout(() => nextItem(false), fromChoice ? 520 : 360);
   }
 
-  function markCorrect() { finalizeItem(true, false); }
-  function markWrong() { finalizeItem(false, false); }
-  function skipItem() { finalizeItem(false, false); }
-
   function checkMastery(showMessage) {
-    const step = getSelectedStepObj();
+    const m = getModeObj();
     const acc = state.total ? (state.correct / state.total) : 1;
     const avg = computeAvgTime();
     const enoughAttempts = state.total >= Math.min(state.setTarget, 6);
-    const passed = enoughAttempts && acc >= step.mastery.acc && avg > 0 && avg <= step.mastery.time;
+    const passed = enoughAttempts && acc >= m.mastery.acc && avg > 0 && avg <= m.mastery.time;
 
     if (showMessage) {
       if (passed) setFeedback("Mastery PASS.", "okText");
-      else setFeedback(`To pass: ≥${Math.round(step.mastery.acc*100)}% and ≤${step.mastery.time}s avg time.`, "");
+      else setFeedback("Keep going.", "");
     }
     return { passed, acc, avg };
   }
 
-  function maybeAutoAdvance() {
-    if (!state.autoAdvance) return;
-    const g = Number(el.grade.value);
-    const idx = Number(el.step.value);
-    const steps = STEPS[g];
-    const mastery = checkMastery(false);
 
-    if (mastery.passed && !state.passedThisWorksheet) {
-      state.passedThisWorksheet = true;
-      if (idx < steps.length - 1) {
-        setFeedback("Mastery PASS. Moving to next step.", "okText");
-        el.step.value = String(idx + 1);
-        updateStepDescription();
-      } else {
-        setFeedback("Mastery PASS. Finished this grade’s steps.", "okText");
-      }
-    }
-  }
+  function clearHistory() {
+    const ok = window.confirm("Clear saved item history? This allows repeats again.");
+    if (!ok) return;
 
-  function finishWorksheetAndLog() {
-    const step = getSelectedStepObj();
-    const mastery = checkMastery(false);
-    const accPct = state.total ? Math.round((state.correct / state.total) * 100) : 100;
+    for (const k of Object.keys(usedByMode)) delete usedByMode[k];
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
 
-    addHistoryEntry({
-      date: todayISO(),
-      ts: Date.now(),
-      grade: Number(el.grade.value),
-      stepId: step.id,
-      stepName: step.name,
-      letter: step.letter,
-      mode: step.mode,
-      items: state.setTarget,
-      attempts: state.total,
-      correct: state.correct,
-      accuracyPct: accPct,
-      avgTime: Number(computeAvgTime().toFixed(1)),
-      masteryPassed: mastery.passed
-    });
+    // Reset session stats and worksheet state
+    state.current = null;
+    state.started = false;
+    state.setDone = 0;
+    state.correct = 0;
+    state.total = 0;
+    state.perItemTimes = [];
+    state.itemStartTs = null;
 
-    renderHistory();
-  }
-
-  // ===================== TIMER (FLUENCY) =====================
-  function fmtMMSS(sec) {
-    const m = Math.floor(sec/60);
-    const s = String(sec%60).padStart(2,"0");
-    return `${m}:${s}`;
-  }
-
-  function startTimer() {
-    stopTimer();
-    state.timerRunning = true;
-    state.timerStart = Date.now();
-    el.timerPill.textContent = "Timer: 1:00";
-
-    state.timerInterval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - state.timerStart)/1000);
-      const left = Math.max(0, 60 - elapsed);
-      el.timerPill.textContent = `Timer: ${fmtMMSS(left)}`;
-      if (left <= 0) {
-        stopTimer();
-        setFeedback("Timer done. Mark correct or incorrect.", "");
-      }
-      updateStats();
-    }, 200);
-
+    el.kindBadge.textContent = "READY";
+    el.itemTitlePill.textContent = "Item: -";
+    el.itemTitle.textContent = "Press Start";
+    el.readingText.textContent = "Press Start to begin.";
+    el.readingText.classList.remove("small");
+    clearChoices();
+    setFeedback("History cleared.", "");
     updateStats();
   }
 
-  function stopTimer() {
-    if (state.timerInterval) clearInterval(state.timerInterval);
-    state.timerInterval = null;
-    state.timerRunning = false;
-    el.timerPill.textContent = "Timer: 0:00";
-    updateStats();
-  }
-
-  // ===================== PRINT =====================
-  function escapeHTML(s) {
-    return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  // ========= PRINT =========
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
   }
 
   function buildPrintItems(count) {
-    const step = getSelectedStepObj();
+    const key = getModeKey();
     const items = [];
-    for (let i=0;i<count;i++) items.push(generateItem(step));
+    for (let i=0; i<count; i++) {
+      const it = generateUniqueItem(key);
+      if (!it) break;
+      items.push(it);
+    }
     return items;
   }
 
+  function renderPrintItemHTML(item, idx) {
+    const kind = item.kind.toUpperCase();
+    const title = item.title || kind;
+    const safeText = (item.text || "").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    let qHtml = "";
+    if (item.question) {
+      const q = item.question;
+      const safeQ = (q.question || "").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      qHtml += `<div class="pQ">Q: ${safeQ}</div>`;
+      q.choices.forEach((c, i) => {
+        const safeC = String(c).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        qHtml += `<div class="pChoice">(${String.fromCharCode(65+i)}) ${safeC}</div>`;
+      });
+      qHtml += `<div style="margin-top:2mm;">Answer: <span class="pBlank"></span></div>`;
+    } else {
+      qHtml += `<div style="margin-top:2mm;">Notes: <span class="pBlank"></span></div>`;
+    }
+
+    return `
+      <div class="pBlock">
+        <div class="pKind">${idx+1}. ${kind} • ${title}</div>
+        <div class="pText">${safeText}</div>
+        ${qHtml}
+      </div>
+    `;
+  }
+
   function renderPrintSheet() {
-    const step = getSelectedStepObj();
-    const g = Number(el.grade.value);
-    const count = clamp(Number(el.targetCount.value || 10), 5, 50);
+    const m = getModeObj();
+    const count = DEFAULT_COUNT;
     const items = buildPrintItems(count);
+    const actualCount = items.length;
     const dateStr = todayISO();
 
-    const blocks = items.map((it, idx) => {
-      const header = `<div class="pMode">${idx+1}. ${escapeHTML(it.kind.toUpperCase())} | ${escapeHTML(it.title)}</div>`;
-      const text = `<div class="pText">${escapeHTML(it.text)}</div>`;
-
-      if (!it.question) {
-        return `<div class="pBlock">${header}${text}<div class="pQ">Check: <span class="pBlank"></span></div></div>`;
-      }
-
-      const q = `<div class="pQ">Q: ${escapeHTML(it.question.question)} <span class="pBlank"></span></div>`;
-      const note = `<div class="pNote">Choices on screen. Student answers orally or writes here.</div>`;
-      return `<div class="pBlock">${header}${text}${q}${note}</div>`;
-    }).join("");
+    const blocks = items.map((it, idx) => renderPrintItemHTML(it, idx)).join("");
 
     el.printArea.innerHTML = `
       <div class="pSheet">
         <div class="pHeader">
-          <div class="pTitle">Reading + Phonics Worksheet</div>
-          <div class="pMeta">Date: ${dateStr}<br/>Grade ${g} | ${escapeHTML(step.id)} (${escapeHTML(step.letter)})</div>
+          <div class="pTitle">Reading Worksheet</div>
+          <div class="pMeta">Date: ${dateStr}<br/>${m.label}</div>
         </div>
         <div class="pLine"></div>
         <div class="pInfo">
           <div>Name: __________________________</div>
-          <div>Time: _____________   Score: ______ / ${count}</div>
+          <div>Time: _____________   Score: ______ / ${actualCount}</div>
         </div>
         ${blocks}
         <div class="pFooter">
-          <div>Step: ${escapeHTML(step.name)}</div>
-          <div>Accuracy first, then speed.</div>
+          <div>Read clearly and think carefully.</div>
+          <div>${m.label}</div>
         </div>
       </div>
     `;
@@ -1219,105 +983,44 @@
 
   function printWorksheet() {
     renderPrintSheet();
-    setTimeout(() => window.print(), 60);
+    setTimeout(() => window.print(), 50);
   }
 
-  // ===================== HISTORY =====================
-  function renderHistory() {
-    const hist = loadHistory();
-    const today = todayISO();
-    const view = (state.historyFilter === "today") ? hist.filter(h => h.date === today) : hist;
-
-    if (!view.length) {
-      el.historyList.innerHTML = `<div class="smallNote">No history yet. Finish a worksheet to log it.</div>`;
-      return;
-    }
-
-    el.historyList.innerHTML = view.slice(0, 25).map(h => {
-      const pass = !!h.masteryPassed;
-      const tagClass = pass ? "pass" : "fail";
-      const tagText = pass ? "PASS" : "TRY AGAIN";
-      const when = new Date(h.ts || Date.now());
-      const hh = String(when.getHours()).padStart(2,"0");
-      const mm = String(when.getMinutes()).padStart(2,"0");
-      return `
-        <div class="histItem">
-          <div class="histLeft">
-            <span class="tag ${tagClass}">${tagText}</span>
-            <span class="tag">G${h.grade}</span>
-            <span class="tag">${h.stepId}</span>
-            <span class="tag">${String(h.mode).toUpperCase()}</span>
-            <span style="opacity:.9;">${h.stepName}</span>
-          </div>
-          <div style="opacity:.92; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <span class="tag">${h.date} ${hh}:${mm}</span>
-            <span class="tag">Acc ${h.accuracyPct}%</span>
-            <span class="tag">Avg ${h.avgTime}s</span>
-            <span class="tag">${h.items} items</span>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // ===================== EVENTS =====================
+  // ========= EVENTS =========
   el.startBtn.addEventListener("click", startWorksheet);
-  el.nextBtn.addEventListener("click", () => nextItem(false));
-  el.markCorrectBtn.addEventListener("click", markCorrect);
-  el.markWrongBtn.addEventListener("click", markWrong);
-  el.skipBtn.addEventListener("click", skipItem);
-
-  el.resetStatsBtn.addEventListener("click", () => {
-    state.correct = 0;
-    state.total = 0;
-    state.perItemTimes = [];
-    state.passedThisWorksheet = false;
-    setFeedback("Stats reset.", "");
-    updateStats();
-  });
-
-  el.toggleAutoAdvanceBtn.addEventListener("click", () => {
-    state.autoAdvance = !state.autoAdvance;
-    el.toggleAutoAdvanceBtn.textContent = `Auto-Advance: ${state.autoAdvance ? "ON" : "OFF"}`;
-  });
-
-  el.grade.addEventListener("change", () => {
-    updateStepDropdown();
-    state.passedThisWorksheet = false;
-    updateStats();
-    renderHistory();
-    if (state.started) startWorksheet();
-  });
-
-  el.step.addEventListener("change", () => {
-    updateStepDescription();
-    state.passedThisWorksheet = false;
-    updateStats();
-    if (state.started) startWorksheet();
-  });
-
   el.printBtn.addEventListener("click", printWorksheet);
-  el.startTimerBtn.addEventListener("click", startTimer);
-  el.stopTimerBtn.addEventListener("click", stopTimer);
+  el.clearHistoryBtn.addEventListener("click", clearHistory);
 
-  el.todayOnlyBtn.addEventListener("click", () => { state.historyFilter = "today"; renderHistory(); });
-  el.allHistoryBtn.addEventListener("click", () => { state.historyFilter = "all"; renderHistory(); });
-  el.clearHistoryBtn.addEventListener("click", () => { localStorage.removeItem(HISTORY_KEY); renderHistory(); });
+  el.markCorrectBtn.addEventListener("click", () => finalizeItem(true, false));
+  el.markWrongBtn.addEventListener("click", () => finalizeItem(false, false));
+  el.nextBtn.addEventListener("click", () => nextItem(false));
 
-  // Session clock
+  el.mode.addEventListener("change", () => {
+    updateStats();
+    if (state.started) startWorksheet();
+  });
+
+  // Session timer (right)
   setInterval(() => {
-    const s = Math.floor((Date.now() - state.sessionStartTs)/1000);
-    const mm = Math.floor(s/60);
-    const ss = String(s%60).padStart(2,"0");
+    const s = Math.floor((Date.now() - state.sessionStartTs) / 1000);
+    const mm = Math.floor(s / 60);
+    const ss = String(s % 60).padStart(2, "0");
     el.sessionClock.textContent = `Session: ${mm}:${ss}`;
   }, 500);
 
-  // ===================== INIT =====================
-  updateStepDropdown();
-  updateStepDescription();
+  // Current time (top center) - hour:minute only
+  const fmt = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
+  function tickNow() { el.clockNow.textContent = `Time: ${fmt.format(new Date())}`; }
+  tickNow();
+  setInterval(tickNow, 1000);
+
+  // Init
   updateStats();
-  renderHistory();
-  el.illustrationBox.innerHTML = illustrationForTheme("library");
+  el.kindBadge.textContent = "READY";
+  el.itemTitlePill.textContent = "Item: -";
+  el.itemTitle.textContent = "Press Start";
+  el.difficultyHint.textContent = getModeObj().label;
+  setFeedback("", "");
 })();
 </script>
 </body>
