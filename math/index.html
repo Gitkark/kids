@@ -429,6 +429,7 @@
     problemStartTs: null,
     sessionStartTs: Date.now(),
     lastLayout: "Mixed",
+    answeredThisProblem: false,
   };
 
   const el = {
@@ -652,6 +653,7 @@
     state.perProblemTimes = [];
     state.problemStartTs = null;
 
+    state.answeredThisProblem = false;
     nextProblem(true);
     updateStats();
   }
@@ -687,13 +689,20 @@
     state.problemStartTs = performance.now();
     setFeedback("", "");
 
-    updateStats();
+    
+
+    state.answeredThisProblem = false;
+    el.checkBtn.disabled = false;
+    el.answer.disabled = false;
+updateStats();
     safeFocusAnswer();
   }
 
   function checkAnswer() {
     if (!state.current) return;
 
+
+    if (state.answeredThisProblem) return;
     const raw = (el.answer.value || "").trim();
     if (!/^-?\d+$/.test(raw)) {
       setFeedback("Type a number.", "badText");
@@ -710,19 +719,23 @@
 
     state.setDone += 1;
 
+    
+    // Lock this problem after one check so stats don't double-count
+    state.answeredThisProblem = true;
+    el.checkBtn.disabled = true;
+    el.answer.disabled = true;
+
     if (userAns === correctAns) {
       state.correct += 1;
       state.streak += 1;
-      setFeedback(`Correct.`, "okText");
+      setFeedback(`Correct. Answer: ${correctAns}`, "okText");
       updateStats();
-      setTimeout(() => nextProblem(false), 260);
     } else {
       state.streak = 0;
-      setFeedback(`Answer: ${correctAns}`, "badText");
+      setFeedback(`Incorrect. Correct answer: ${correctAns}`, "badText");
       updateStats();
-      setTimeout(() => nextProblem(false), 520);
     }
-  }
+}
 
   
   function clearHistory() {
